@@ -913,7 +913,20 @@ const defaultState = {
 };
 
 let state = JSON.parse(localStorage.getItem('wedding_app_state')) || defaultState;
+  
+// SYSTÈME DE VÉRIFICATION DU MOT DE PASSE AU DÉMARRAGE
+const MOT_DE_PASSE_ATTENDU = "C&C2026"; // <--- Choisissez votre mot de passe ici
 
+if (sessionStorage.getItem('site_autorise') !== 'true') {
+  let saisie = prompt("Veuillez saisir le code d'accès confidentiel pour consulter le tableau de bord :");
+  if (saisie === MOT_DE_PASSE_ATTENDU) {
+    sessionStorage.setItem('site_autorise', 'true');
+  } else {
+    alert("Code incorrect. Accès refusé.");
+    document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#faf7f2; color:#3a3530;'><h1>Accès restreint.</h1></div>";
+    window.stop();
+  }
+}
 if (!state.coupleNames) state.coupleNames = defaultState.coupleNames;
 if (!state.totalBudget) state.totalBudget = defaultState.totalBudget;
 if (!state.weddingDate) state.weddingDate = defaultState.weddingDate;
