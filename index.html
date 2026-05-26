@@ -368,7 +368,7 @@
   // --- BLOC DE SÉCURITÉ (Exécuté immédiatement avant le chargement de Firebase) ---
   function checkLockPassword() {
     const input = document.getElementById('lock-input').value;
-    if (input === "C&C2026") {
+    if (input === "TEST26") {
       sessionStorage.setItem('dashboard_unlocked', 'true');
       document.getElementById('lock-screen').style.display = 'none';
       if (typeof window.toast === 'function') {
