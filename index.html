@@ -110,15 +110,15 @@
 </head>
 <body>
 
-//<div id="lock-screen">
-//  <div class="lock-box">
-//    <h2>Espace Confidentiel</h2>
-//    <div class="form-group">
-//      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe d'accès..." style="text-align:center;">
-//    </div>
-//    <button class="btn btn-gold" style="width:100%;" onclick="checkLockPassword()">Entrer</button>
-//  </div>
-//</div>
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>Espace Confidentiel</h2>
+    <div class="form-group">
+      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe d'accès..." style="text-align:center;">
+    </div>
+    <button class="btn btn-gold" style="width:100%;" onclick="checkLockPassword()">Entrer</button>
+  </div>
+</div>
 
 <header>
   <h1 id="header-names">... & ...</h1>
@@ -453,25 +453,25 @@ const firebaseConfig = {
     }
   }
 
- //     // Écran de déverrouillage de session basique
- //     window.checkLockPassword = function() {
- //       const input = document.getElementById('lock-input').value;
- //       if(input === "C&C2026") {
- //         sessionStorage.setItem('dashboard_unlocked', 'true');
- //         document.getElementById('lock-screen').style.display = 'none';
- //         // Petite astuce : on rafraîchit pour forcer le premier rendu
- //         window.location.reload();
- //       } else {
- //         alert("Code d'accès incorrect.");
- //       }
- //     };
+      // Écran de déverrouillage de session basique
+      window.checkLockPassword = function() {
+        const input = document.getElementById('lock-input').value;
+        if(input === "C&C2026") {
+          sessionStorage.setItem('dashboard_unlocked', 'true');
+          document.getElementById('lock-screen').style.display = 'none';
+          // Petite astuce : on rafraîchit pour forcer le premier rendu
+          window.location.reload();
+        } else {
+          alert("Code d'accès incorrect.");
+        }
+      };
     
- //     // Au démarrage, on vérifie si la personne a déjà déverrouillé l'écran
- //     window.addEventListener('DOMContentLoaded', () => {
- //       if(sessionStorage.getItem('dashboard_unlocked') === 'true') {
- //         document.getElementById('lock-screen').style.display = 'none';
- //       }
- //     });
+      // Au démarrage, on vérifie si la personne a déjà déverrouillé l'écran
+      window.addEventListener('DOMContentLoaded', () => {
+        if(sessionStorage.getItem('dashboard_unlocked') === 'true') {
+          document.getElementById('lock-screen').style.display = 'none';
+        }
+      });
 
 
   // ── MOTEUR DE RENDU ET LOGIQUE COMMUNE ───────────────────────────────────────
