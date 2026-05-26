@@ -404,8 +404,8 @@ const firebaseConfig = {
 
   // État initial de l'application (Fallback si Firebase est vide lors du tout premier démarrage)
   const defaultState = {
-    coupleNames: "Sophie & Thomas",
-    totalBudget: 25000,
+    coupleNames: "Clara & Clément",
+    totalBudget: 20000,
     weddingDate: "2026-06-20",
     location: "Normandie, France",
     guests: [],
@@ -457,7 +457,7 @@ const firebaseConfig = {
   window.checkLockPassword = function() {
     const input = document.getElementById('lock-input').value;
     // Choisissez votre mot de passe d'accès ici
-    if(input === "NotreMariage2026") {
+    if(input === "C&C2026") {
       sessionStorage.setItem('dashboard_unlocked', 'true');
       document.getElementById('lock-screen').style.display = 'none';
       toast("Connexion établie avec Firebase Cloud");
