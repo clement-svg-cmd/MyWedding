@@ -453,14 +453,14 @@ const firebaseConfig = {
     }
   }
 
-  // Écran de déverrouillage de session basique
+// Écran de déverrouillage de session basique
   window.checkLockPassword = function() {
     const input = document.getElementById('lock-input').value;
-    // Choisissez votre mot de passe d'accès ici
     if(input === "C&C2026") {
       sessionStorage.setItem('dashboard_unlocked', 'true');
       document.getElementById('lock-screen').style.display = 'none';
-      toast("Connexion établie avec Firebase Cloud");
+      // Petite astuce : on rafraîchit pour forcer le premier rendu
+      window.location.reload();
     } else {
       alert("Code d'accès incorrect.");
     }
