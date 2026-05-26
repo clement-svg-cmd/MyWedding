@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Notre Mariage - Tableau de bord Cloud</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap\" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --ivory: #faf7f2;
@@ -23,163 +23,168 @@
     --shadow-lg: 0 8px 40px rgba(58,53,48,0.12);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Jost', sans-serif; background-color: var(--ivory); color: var(--text); line-height: 1.6; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
-  
-  h1, h2, h3, .brand-font { font-family: 'Cormorant Garamond', serif; font-weight: 400; color: var(--text); }
-  
-  header { background-color: var(--white); box-shadow: var(--shadow); padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--ivory-dark); position: relative; }
-  header h1 { font-size: 2.8rem; letter-spacing: 2px; margin-bottom: 5px; font-style: italic; }
-  header p { font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); font-weight: 300; }
-  
-  .nav-tabs { display: flex; justify-content: center; background: var(--white); border-bottom: 1px solid var(--ivory-dark); sticky: top; position: sticky; top: 0; z-index: 900; overflow-x: auto; white-space: nowrap; }
-  .tab-btn { background: none; border: none; padding: 16px 24px; font-family: 'Jost', sans-serif; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); cursor: pointer; transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-  .tab-btn:hover { color: var(--sage); }
-  .tab-btn.active { color: var(--text); border-bottom-color: var(--gold); font-weight: 500; }
-  
-  .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Jost', sans-serif; }
+  body { background-color: var(--ivory); color: var(--text); line-height: 1.6; }
+
+  /* Écran de verrouillage fixe */
+  #lock-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--ivory); z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px; text-align: center;
+  }
+  .lock-card {
+    background: var(--white); padding: 40px; border-radius: 12px;
+    box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;
+  }
+
+  /* Structure Application */
+  header { background: var(--white); padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--ivory-dark); box-shadow: var(--shadow); }
+  header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 400; color: var(--sage-dark); margin-bottom: 5px; }
+  header p { font-size: 1rem; color: var(--text-muted); letter-spacing: 0.5px; }
+
+  .nav-tabs { display: flex; justify-content: center; background: var(--white); border-bottom: 1px solid var(--ivory-dark); overflow-x: auto; }
+  .tab-btn { background: none; border: none; padding: 15px 25px; font-size: 0.95rem; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .tab-btn:hover { color: var(--sage-dark); }
+  .tab-btn.active { color: var(--sage-dark); border-bottom-color: var(--sage); }
+
+  main { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
   .tab-content { display: none; }
-  .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-  
+  .tab-content.active { display: block; animation: fadeIn 0.4s ease forwards; }
+
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Grilles & Cartes */
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 40px; }
+  .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid rgba(240,235,225,0.6); position: relative; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--sage-dark); margin-bottom: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
   
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 40px; }
-  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; gap: 20px; } }
+  .stat-number { font-size: 2.2rem; font-weight: 400; color: var(--text); margin-bottom: 5px; font-family: 'Cormorant Garamond', serif; }
+  .stat-desc { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* Formulaires et Boutons */
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--ivory-dark); background-color: var(--ivory); border-radius: 6px; font-size: 0.95rem; color: var(--text); transition: border-color 0.2s; }
+  .form-control:focus { outline: none; border-color: var(--sage); background-color: var(--white); }
   
-  .card { background: var(--white); border-radius: 12px; padding: 30px; box-shadow: var(--shadow); border: 1px solid rgba(240,235,225,0.6); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-  .card h3 { font-size: 1.8rem; margin-bottom: 15px; border-bottom: 1px solid var(--ivory-dark); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .btn { display: inline-block; background-color: var(--sage-dark); color: var(--white); padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s; text-decoration: none; text-align: center; }
+  .btn:hover { background-color: var(--sage); }
+  .btn-outline { background: none; border: 1px solid var(--sage); color: var(--sage-dark); }
+  .btn-outline:hover { background: var(--ivory); }
+  .btn-danger { background-color: #cc5c5c; }
+  .btn-danger:hover { background-color: #e07373; }
+  .btn-sm { padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; }
+
+  /* Tableaux */
+  .table-container { background: var(--white); border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; margin-top: 20px; border: 1px solid rgba(240,235,225,0.6); }
+  table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+  th, td { padding: 14px 20px; border-bottom: 1px solid var(--ivory-dark); }
+  th { background-color: rgba(24faf2, 247, 242, 0.5); font-weight: 500; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  tr:last-child td { border-bottom: none; }
   
-  .stat-number { font-size: 2.5rem; font-family: 'Cormorant Garamond', serif; color: var(--sage-dark); font-weight: 400; margin: 10px 0; }
-  .stat-desc { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-  
-  .btn { display: inline-flex; align-items: center; justify-content: center; background-color: var(--sage); color: var(--white); border: none; padding: 12px 24px; font-family: 'Jost', sans-serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
-  .btn:hover { background-color: var(--sage-dark); transform: translateY(-1px); }
-  .btn-gold { background-color: var(--gold); }
-  .btn-gold:hover { background-color: #b39359; }
-  .btn-outline { background: none; border: 1px solid var(--sage); color: var(--sage); }
-  .btn-outline:hover { background: var(--sage); color: var(--white); }
-  .btn-sm { padding: 6px 12px; font-size: 0.75rem; letter-spacing: 1px; border-radius: 4px; }
-  .btn-danger { background-color: #d96868; }
-  .btn-danger:hover { background-color: #bd4f4f; }
-  
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; }
-  th { padding: 14px 16px; background-color: var(--ivory); color: var(--text); font-weight: 500; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid var(--ivory-dark); }
-  td { padding: 14px 16px; border-bottom: 1px solid var(--ivory-dark); font-size: 0.95rem; color: var(--text); vertical-align: middle; }
-  tr:hover td { background-color: rgba(250,247,242,0.5); }
-  
-  .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-  .badge-yes { background-color: #e2ece4; color: var(--sage-dark); }
+  .badge { display: inline-block; padding: 3px 8px; font-size: 0.75rem; font-weight: 500; border-radius: 4px; }
+  .badge-yes { background-color: #e3ede4; color: var(--sage-dark); }
   .badge-no { background-color: #fceae6; color: #cc5c5c; }
-  .badge-pending { background-color: #fef3df; color: #b38024; }
-  
-  .progress-bar-container { background-color: var(--ivory-dark); height: 8px; border-radius: 4px; width: 100%; margin-top: 10px; overflow: hidden; }
-  .progress-bar { background-color: var(--gold); height: 100%; width: 0%; transition: width 0.5s ease; }
-  
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: var(--text-muted); }
-  .form-control { width: 100%; padding: 12px 16px; font-family: 'Jost', sans-serif; font-size: 0.95rem; border: 1px solid var(--ivory-dark); border-radius: 6px; background-color: var(--white); color: var(--text); transition: border-color 0.3s ease; }
-  .form-control:focus { outline: none; border-color: var(--sage); }
-  
-  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(58,53,48,0.4); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; opacity: 0; transition: opacity 0.3s ease; }
-  .modal-overlay.active { display: flex; opacity: 1; }
-  .modal-window { background: var(--white); border-radius: 12px; width: 100%; max-width: 550px; padding: 35px; box-shadow: var(--shadow-lg); transform: scale(0.9); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
-  .modal-overlay.active .modal-window { transform: scale(1); }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--ivory-dark); }
-  .modal-header h2 { font-size: 2rem; }
-  .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-  
-  .toast-msg { position: fixed; bottom: 30px; right: 30px; background-color: var(--text); color: var(--white); padding: 14px 28px; border-radius: 6px; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: var(--shadow-lg); z-index: 3000; display: none; animation: slideUp 0.3s ease; }
-  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  
-  .flex-actions { display: flex; gap: 8px; justify-content: flex-end; }
-  .section-title-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-  .tasks-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
-  @media(max-width:768px){ .tasks-container { grid-template-columns: 1fr; } }
-  .task-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-bottom: 1px solid var(--ivory-dark); }
-  .task-checkbox { width: 18px; height: 18px; margin-top: 4px; cursor: pointer; accent-color: var(--sage); }
+  .badge-pending { background-color: #f7f2e8; color: var(--gold); }
+
+  /* Barre de progression */
+  .progress-container { background: var(--ivory-dark); border-radius: 4px; height: 8px; width: 100%; margin-top: 10px; overflow: hidden; }
+  .progress-bar { background: var(--gold); height: 100%; width: 0%; transition: width 0.4s; }
+
+  /* Modales */
+  .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(58,53,48,0.4); z-index: 1000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity 0.3s; padding: 20px; }
+  .modal-overlay.active { opacity:1; pointer-events:auto; }
+  .modal-card { background: var(--white); padding: 30px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: var(--shadow-lg); position: relative; transform: translateY(-20px); transition: transform 0.3s; }
+  .modal-overlay.active .modal-card { transform: translateY(0); }
+  .close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
+
+  /* Tâches de Check-list */
+  .task-item { display: flex; align-items: center; padding: 12px 15px; background: var(--ivory); border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--sage); }
+  .task-checkbox { margin-right: 15px; width: 18px; height: 18px; cursor: pointer; accent-color: var(--sage-dark); }
   .task-details { flex: 1; }
   .task-details.done .t-title { text-decoration: line-through; color: var(--text-muted); }
-  .t-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .link-card { border-left: 3px solid var(--gold); padding-left: 15px; margin-bottom: 15px; }
-  
-  #lock-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:#faf7f2; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; }
-  .lock-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); text-align:center; max-width:400px; width:90%; }
-  .lock-box h2 { margin-bottom:20px; font-size:1.8rem; font-family:'Cormorant Garamond', serif; }
+  .t-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+  .flex-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  #toast { display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--text); color:var(--white); padding:12px 25px; border-radius:30px; font-size:0.9rem; z-index:10000; box-shadow:var(--shadow-lg); }
+
+  @media(max-width: 768px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    header h1 { font-size: 2rem; }
+  }
 </style>
 </head>
 <body>
 
 <div id="lock-screen">
-  <div class="lock-box">
-    <h2>Espace Confidentiel</h2>
+  <div class="lock-card">
+    <h2 style="font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:400; margin-bottom:15px; color:var(--sage-dark);">Espace Confidentiel</h2>
+    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:25px;">Veuillez renseigner la clé d'authentification pour synchroniser le tableau de bord.</p>
     <div class="form-group">
-      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe d'accès..." style="text-align:center;">
+      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe..." style="text-align:center;" onkeypress="if(event.key==='Enter') checkLockPassword()">
     </div>
-    <button class="btn btn-gold" style="width:100%;" onclick="checkLockPassword()">Entrer</button>
+    <button class="btn" style="width:100%; margin-top:5px;" onclick="checkLockPassword()">Se connecter</button>
   </div>
 </div>
 
 <header>
-  <h1 id="header-names">... & ...</h1>
-  <p id="header-countdown">Chargement du compte à rebours...</p>
+  <h1 id="header-names">Chargement...</h1>
+  <p id="header-countdown">Connexion au réseau Firebase Cloud...</p>
 </header>
 
 <nav class="nav-tabs">
-  <button class="tab-btn active" onclick="switchTab('vue-generale')">Général</button>
-  <button class="tab-btn" onclick="switchTab('invites')">Invités</button>
-  <button class="tab-btn" onclick="switchTab('budget-tab')">Budget</button>
-  <button class="tab-btn" onclick="switchTab('prestataires')">Prestataires</button>
-  <button class="tab-btn" onclick="switchTab('taches')">Planning</button>
-  <button class="tab-btn" onclick="switchTab('idees')">Idées & Liens</button>
-  <button class="tab-btn" onclick="switchTab('config-tab')">Paramètres</button>
+  <button class="tab-btn active" onclick="switchTab('tab-dash')">Vue Générale</button>
+  <button class="tab-btn" onclick="switchTab('tab-guests')">Invités</button>
+  <button class="tab-btn" onclick="switchTab('tab-budget')">Budget</button>
+  <button class="tab-btn" onclick="switchTab('tab-vendors')">Prestataires</button>
+  <button class="tab-btn" onclick="switchTab('tab-tasks')">Planning</button>
+  <button class="tab-btn" onclick="switchTab('tab-links')">Idées & Liens</button>
+  <button class="tab-btn" onclick="switchTab('tab-settings')">Configuration</button>
 </nav>
 
-<div class="container">
-  
-  <div id="vue-generale" class="tab-content active">
+<main>
+  <div id="tab-dash" class="tab-content active">
     <div class="grid-3">
       <div class="card">
-        <h3>Invités <span style="font-size: 1rem; color: var(--sage);">👥</span></h3>
-        <div class="stat-number" id="dash-guests-count">0</div>
-        <div class="stat-desc" id="dash-guests-desc">0 confirmés • 0 enfants</div>
+        <div class="card-title">Suivi des Invités</div>
+        <div class="stat-number" id="dash-guests-count">-</div>
+        <div class="stat-desc" id="dash-guests-desc">Calcul en cours...</div>
       </div>
       <div class="card">
-        <h3>Budget <span style="font-size: 1rem; color: var(--gold);">💶</span></h3>
-        <div class="stat-number" id="dash-budget-spent">0 €</div>
-        <div class="stat-desc" id="dash-budget-desc">Sur un total de 0 €</div>
-        <div class="progress-bar-container"><div class="progress-bar" id="dash-budget-bar"></div></div>
+        <div class="card-title">Budget Global</div>
+        <div class="stat-number" id="dash-budget-spent">-</div>
+        <div class="stat-desc" id="dash-budget-desc">...</div>
+        <div class="progress-container"><div class="progress-bar" id="dash-budget-bar"></div></div>
       </div>
       <div class="card">
-        <h3>Tâches <span style="font-size: 1rem; color: var(--blush);">📋</span></h3>
-        <div class="stat-number" id="dash-tasks-count">0</div>
-        <div class="stat-desc" id="dash-tasks-desc">0 restantes</div>
+        <div class="card-title">Plan de Route</div>
+        <div class="stat-number" id="dash-tasks-count">-</div>
+        <div class="stat-desc" id="dash-tasks-desc">...</div>
       </div>
     </div>
-    <div class="card">
-      <h3>Informations Générales</h3>
-      <table style="margin-top:10px;">
-        <tr><td style="font-weight:500; width:30%;">Date retenue :</td><td id="dash-info-date">-</td></tr>
-        <tr><td style="font-weight:500;">Lieu de réception :</td><td id="dash-info-location">-</td></tr>
-      </table>
+    <div class="card" style="max-width: 500px; margin: 0 auto;">
+      <div class="card-title">Informations Majeures</div>
+      <div style="margin-bottom:10px;">Date retenue : <strong id="dash-info-date">-</strong></div>
+      <div>Lieu des festivités : <strong id="dash-info-location">-</strong></div>
     </div>
   </div>
 
-  <div id="invites" class="tab-content">
-    <div class="section-title-area">
-      <h2 style="font-size:2.2rem;">Liste des Invités</h2>
-      <button class="btn" onclick="openModal('modal-add-guest')">Ajouter un groupe / invité</button>
+  <div id="tab-guests" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Répertoire des Présences</h3>
+      <button class="btn btn-outline" onclick="openModal('modal-add-guest')">+ Nouveau Groupe / Famille</button>
     </div>
-    <div class="card" style="padding:15px; overflow-x:auto;">
+    <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Nom / Foyer</th>
-            <th>Type</th>
+            <th>Nom / Groupe</th>
+            <th>Cercle</th>
             <th>Adultes</th>
             <th>Enfants</th>
-            <th>Présence</th>
-            <th>Régime / Notes</th>
+            <th>Statut RSVP</th>
+            <th>Notes de table</th>
             <th style="text-align:right;">Actions</th>
           </tr>
         </thead>
@@ -188,19 +193,19 @@
     </div>
   </div>
 
-  <div id="budget-tab" class="tab-content">
-    <div class="section-title-area">
-      <h2 style="font-size:2.2rem;">Postes Budgétaires</h2>
-      <button class="btn" onclick="openModal('modal-add-budget')">Ajouter un poste</button>
+  <div id="tab-budget" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Comptabilité des Coûts</h3>
+      <button class="btn btn-outline" onclick="openModal('modal-add-budget')">+ Nouveau Poste</button>
     </div>
-    <div class="card" style="padding:15px; overflow-x:auto;">
+    <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Poste de dépense</th>
-            <th>Budget Alloué</th>
-            <th>Montant Engagé/Payé</th>
-            <th>Écart</th>
+            <th>Poste budgétaire</th>
+            <th>Estimation allouée</th>
+            <th>Frais Réels réglés</th>
+            <th>Balance différentielle</th>
             <th style="text-align:right;">Actions</th>
           </tr>
         </thead>
@@ -209,20 +214,20 @@
     </div>
   </div>
 
-  <div id="prestataires" class="tab-content">
-    <div class="section-title-area">
-      <h2 style="font-size:2.2rem;">Prestataires Engagés</h2>
-      <button class="btn" onclick="openModal('modal-add-vendor')">Ajouter un prestataire</button>
+  <div id="tab-vendors" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Annuaire Prestataires</h3>
+      <button class="btn btn-outline" onclick="openModal('modal-add-vendor')">+ Enregistrer un Prestataire</button>
     </div>
-    <div class="card" style="padding:15px; overflow-x:auto;">
+    <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Catégorie</th>
-            <th>Nom de l'entreprise</th>
-            <th>Contact / Tél</th>
-            <th>Tarif convenu</th>
-            <th>Statut Contrat</th>
+            <th>Corps de métier</th>
+            <th>Nom de l'enseigne</th>
+            <th>Coordonnées</th>
+            <th>Coût Prestation</th>
+            <th>Statut Engagement</th>
             <th style="text-align:right;">Actions</th>
           </tr>
         </thead>
@@ -231,181 +236,185 @@
     </div>
   </div>
 
-  <div id="taches" class="tab-content">
-    <div class="section-title-area">
-      <h2 style="font-size:2.2rem;">Suivi des Tâches</h2>
-      <button class="btn" onclick="openModal('modal-add-task')">Créer une tâche</button>
+  <div id="tab-tasks" class="tab-content" style="max-width:700px; margin: 0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Plan d'actions</h3>
+      <button class="btn btn-outline btn-sm" onclick="openModal('modal-add-task')">+ Ajouter une action</button>
     </div>
-    <div class="tasks-container">
-      <div class="card">
-        <h3 style="color:var(--sage-dark);">À faire</h3>
-        <div id="tasks-todo-list" style="margin-top:15px;"></div>
-      </div>
-      <div class="card">
-        <h3 style="color:var(--text-muted);">Terminées</h3>
-        <div id="tasks-done-list" style="margin-top:15px;"></div>
-      </div>
-    </div>
+    <h4 style="font-size:1.1rem; margin-bottom:10px; color:var(--text-muted);">À Réaliser</h4>
+    <div id="tasks-todo-list" style="margin-bottom:30px;"></div>
+    <h4 style="font-size:1.1rem; margin-bottom:10px; color:var(--text-muted);">Terminées</h4>
+    <div id="tasks-done-list"></div>
   </div>
 
-  <div id="idees" class="tab-content">
-    <div class="section-title-area">
-      <h2 style="font-size:2.2rem;">Boîte à Idées & Liens Utiles</h2>
-      <button class="btn" onclick="openModal('modal-add-link')">Ajouter une idée</button>
+  <div id="tab-links" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+      <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Inspirations & Stockage</h3>
+      <button class="btn btn-outline" onclick="openModal('modal-add-link')">+ Ajouter une Note / Lien</button>
     </div>
-    <div id="links-container" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"></div>
+    <div id="links-container" style="display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:20px;"></div>
   </div>
 
-  <div id="config-tab" class="tab-content">
-    <h2 style="font-size:2.2rem; margin-bottom:25px;">Paramètres Généraux</h2>
-    <div class="card" style="max-width:600px;">
+  <div id="tab-settings" class="tab-content" style="max-width:500px; margin: 0 auto;">
+    <div class="card">
+      <div class="card-title">Paramètres Généraux</div>
       <div class="form-group">
-        <label>Noms du couple</label>
+        <label>Noms du Couple</label>
         <input type="text" id="settings-names" class="form-control">
       </div>
       <div class="form-group">
-        <label>Budget total global (€)</label>
+        <label>Budget Cible Global (€)</label>
         <input type="number" id="settings-budget" class="form-control">
       </div>
       <div class="form-group">
-        <label>Date du mariage</label>
+        <label>Date retenue</label>
         <input type="date" id="settings-date" class="form-control">
       </div>
       <div class="form-group">
-        <label>Lieu de réception</label>
+        <label>Lieu / Zone géo</label>
         <input type="text" id="settings-location" class="form-control">
       </div>
-      <button class="btn btn-gold" onclick="saveGeneralSettings()">Sauvegarder les configurations</button>
+      <button class="btn" style="width:100%; margin-top:10px;" onclick="saveGeneralSettings()">Sauvegarder les données</button>
     </div>
   </div>
-
-</div>
+</main>
 
 <div id="modal-add-guest" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Nouvel Invité / Foyer</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Nom de famille ou du groupe</label><input type="text" id="add-g-name" class="form-control"></div>
-    <div class="form-group"><label>Type d'invité</label><select id="add-g-type" class="form-control"><option value="Famille">Famille</option><option value="Ami">Ami</option><option value="Témoin">Témoin</option><option value="Autre">Autre</option></select></div>
-    <div class="form-group"><label>Nombre d'adultes</label><input type="number" id="add-g-adults" class="form-control" value="1"></div>
-    <div class="form-group"><label>Nombre d'enfants</label><input type="number" id="add-g-kids" class="form-control" value="0"></div>
-    <div class="form-group"><label>Statut Présence</label><select id="add-g-status" class="form-control"><option value="En attente">En attente</option><option value="Confirmé">Confirmé</option><option value="Décliné">Décliné</option></select></div>
-    <div class="form-group"><label>Régimes alimentaires / Notes</label><input type="text" id="add-g-notes" class="form-control"></div>
-    <button class="btn" style="width:100%;" onclick="addGuestSubmit()">Enregistrer</button>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Ajouter un groupe d'invités</h3>
+    <div class="form-group"><label>Nom de famille ou du Groupe</label><input type="text" id="add-g-name" class="form-control" placeholder="Ex: Famille Martin"></div>
+    <div class="form-group"><label>Cercle d'appartenance</label><select id="add-g-type" class="form-control"><option value="Marié">Cercle Marié</option><option value="Mariée">Cercle Mariée</option><option value="Commun">Amis Communs</option></select></div>
+    <div class="grid-3" style="grid-template-columns:1fr 1fr; gap:10px; margin-bottom:0;"><div class="form-group"><label>Adultes</label><input type="number" id="add-g-adults" class="form-control" value="1"></div><div class="form-group"><label>Enfants</label><input type="number" id="add-g-kids" class="form-control" value="0"></div></div>
+    <div class="form-group"><label>Statut RSVP</label><select id="add-g-status" class="form-control"><option value="En attente">En attente</option><option value="Confirmé">Confirmé</option><option value="Décliné">Décliné</option></select></div>
+    <div class="form-group"><label>Notes (Allergies, hébergement, etc)</label><textarea id="add-g-notes" class="form-control" rows="2"></textarea></div>
+    <button class="btn" style="width:100%;" onclick="addGuestSubmit()">Valider l'inscription</button>
   </div>
 </div>
 
 <div id="modal-edit-guest" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Modifier l'invité</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Modifier la fiche invité</h3>
     <input type="hidden" id="edit-g-id">
-    <div class="form-group"><label>Nom de famille ou du groupe</label><input type="text" id="edit-g-name" class="form-control"></div>
-    <div class="form-group"><label>Type d'invité</label><select id="edit-g-type" class="form-control"><option value="Famille">Famille</option><option value="Ami">Ami</option><option value="Témoin">Témoin</option><option value="Autre">Autre</option></select></div>
-    <div class="form-group"><label>Nombre d'adultes</label><input type="number" id="edit-g-adults" class="form-control"></div>
-    <div class="form-group"><label>Nombre d'enfants</label><input type="number" id="edit-g-kids" class="form-control"></div>
-    <div class="form-group"><label>Statut Présence</label><select id="edit-g-status" class="form-control"><option value="En attente">En attente</option><option value="Confirmé">Confirmé</option><option value="Décliné">Décliné</option></select></div>
-    <div class="form-group"><label>Régimes alimentaires / Notes</label><input type="text" id="edit-g-notes" class="form-control"></div>
-    <button class="btn" style="width:100%;" onclick="saveEditGuestSubmit()">Mettre à jour</button>
+    <div class="form-group"><label>Nom de famille / Groupe</label><input type="text" id="edit-g-name" class="form-control"></div>
+    <div class="form-group"><label>Cercle</label><select id="edit-g-type" class="form-control"><option value="Marié">Cercle Marié</option><option value="Mariée">Cercle Mariée</option><option value="Commun">Amis Communs</option></select></div>
+    <div class="grid-3" style="grid-template-columns:1fr 1fr; gap:10px; margin-bottom:0;"><div class="form-group"><label>Adultes</label><input type="number" id="edit-g-adults" class="form-control"></div><div class="form-group"><label>Enfants</label><input type="number" id="edit-g-kids" class="form-control"></div></div>
+    <div class="form-group"><label>Statut RSVP</label><select id="edit-g-status" class="form-control"><option value="En attente">En attente</option><option value="Confirmé">Confirmé</option><option value="Décliné">Décliné</option></select></div>
+    <div class="form-group"><label>Notes</label><textarea id="edit-g-notes" class="form-control" rows="2"></textarea></div>
+    <button class="btn" style="width:100%;" onclick="saveEditGuestSubmit()">Enregistrer les modifications</button>
   </div>
 </div>
 
 <div id="modal-add-budget" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Nouveau Poste Budgétaire</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Désignation du poste</label><input type="text" id="add-b-name" class="form-control" placeholder="Ex: Traiteur, Robe, Photographe..."></div>
-    <div class="form-group"><label>Budget alloué (€)</label><input type="number" id="add-b-alloc" class="form-control" value="0"></div>
-    <div class="form-group"><label>Montant engagé / payé (€)</label><input type="number" id="add-b-spent" class="form-control" value="0"></div>
-    <button class="btn" style="width:100%;" onclick="addBudgetSubmit()">Créer le poste</button>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Nouveau poste de dépense</h3>
+    <div class="form-group"><label>Intitulé de la ligne</label><input type="text" id="add-b-name" class="form-control" placeholder="Ex: Traiteur, Robe, Location de salle"></div>
+    <div class="form-group"><label>Estimation budgétaire allouée (€)</label><input type="number" id="add-b-alloc" class="form-control" value="0"></div>
+    <div class="form-group"><label>Montant déjà payé / Engagé (€)</label><input type="number" id="add-b-spent" class="form-control" value="0"></div>
+    <button class="btn" style="width:100%;" onclick="addBudgetSubmit()">Créer la ligne</button>
   </div>
 </div>
 
 <div id="modal-edit-budget" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Modifier le poste budgétaire</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Ajuster la ligne budgétaire</h3>
     <div id="edit-budget-container"></div>
   </div>
 </div>
 
 <div id="modal-add-vendor" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Nouveau Prestataire</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Catégorie métier</label><input type="text" id="add-v-cat" class="form-control" placeholder="Ex: Musique, Fleurs..."></div>
-    <div class="form-group"><label>Nom de l'entreprise</label><input type="text" id="add-v-name" class="form-control"></div>
-    <div class="form-group"><label>Contact (Tél, Mail, Nom)</label><input type="text" id="add-v-contact" class="form-control"></div>
-    <div class="form-group"><label>Tarif convenu global (€)</label><input type="number" id="add-v-amount" class="form-control" value="0"></div>
-    <div class="form-group"><label>Statut engagement</label><select id="add-v-status" class="form-control"><option value="Recherche / Devis">Recherche / Devis</option><option value="Option validée">Option validée</option><option value="Contrat signé">Contrat signé</option></select></div>
-    <button class="btn" style="width:100%;" onclick="addVendorSubmit()">Ajouter le prestataire</button>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Nouveau prestataire</h3>
+    <div class="form-group"><label>Corps de métier</label><input type="text" id="add-v-cat" class="form-control" placeholder="Ex: Photographe, DJ, Coiffeur"></div>
+    <div class="form-group"><label>Nom de l'entreprise / Contact</label><input type="text" id="add-v-name" class="form-control"></div>
+    <div class="form-group"><label>Téléphone / Mail / Infos de contact</label><input type="text" id="add-v-contact" class="form-control"></div>
+    <div class="form-group"><label>Montant du Devis global (€)</label><input type="number" id="add-v-amount" class="form-control" value="0"></div>
+    <div class="form-group"><label>Statut contractuel</label><select id="add-v-status" class="form-control"><option value="En cours de discussion">En discussion</option><option value="Contrat signé">Contrat signé</option></select></div>
+    <button class="btn" style="width:100%;" onclick="addVendorSubmit()">Enregistrer</button>
   </div>
 </div>
 
 <div id="modal-add-task" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Nouvelle Tâche de planification</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Intitulé de l'action</label><input type="text" id="add-t-name" class="form-control"></div>
-    <div class="form-group"><label>Responsable (Initiales ou prénom)</label><input type="text" id="add-t-owner" class="form-control" placeholder="Ex: L & T"></div>
-    <div class="form-group"><label>Échéance (Date ou texte)</label><input type="text" id="add-t-due" class="form-control" placeholder="Ex: Fin mai, Décembre..."></div>
-    <div class="form-group"><label>Catégorie d'action</label><input type="text" id="add-t-tag" class="form-control" placeholder="Ex: Administratif, Déco..."></div>
-    <div class="form-group"><label>Section</label><select id="add-t-sec" class="form-control"><option value="todo">À faire</option><option value="done">Terminée</option></select></div>
-    <button class="btn" style="width:100%;" onclick="addTaskSubmit()">Créer la tâche</button>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Ajouter une action</h3>
+    <div class="form-group"><label>Nom de la tâche à accomplir</label><input type="text" id="add-t-name" class="form-control" placeholder="Ex: Envoyer les faire-part"></div>
+    <div class="form-group"><label>Qui s'en occupe ?</label><input type="text" id="add-t-owner" class="form-control" placeholder="Prénom ou 'Les Deux'"></div>
+    <div class="grid-3" style="grid-template-columns:1fr 1fr; gap:10px; margin-bottom:0;"><div class="form-group"><label>Échéance indicative</label><input type="text" id="add-t-due" class="form-control" placeholder="Ex: Fin Décembre"></div><div class="form-group"><label>Catégorie / Thème</label><input type="text" id="add-t-tag" class="form-control" placeholder="Ex: Traiteur, Admin"></div></div>
+    <div class="form-group"><label>Statut de départ</label><select id="add-t-sec" class="form-control"><option value="todo">À faire</option><option value="done">Terminée d'office</option></select></div>
+    <button class="btn" style="width:100%;" onclick="addTaskSubmit()">Inscrire l'action</button>
   </div>
 </div>
 
 <div id="modal-add-link" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-window">
-    <div class="modal-header"><h2>Ajouter une idée ou un lien inspirant</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Titre de l'idée</label><input type="text" id="add-l-title" class="form-control"></div>
-    <div class="form-group"><label>Adresse Web (URL)</label><input type="text" id="add-l-url" class="form-control" value="https://"></div>
-    <div class="form-group"><label>Description / Note</label><input type="text" id="add-l-desc" class="form-control"></div>
-    <div class="form-group"><label>Thématique</label><input type="text" id="add-l-label" class="form-control" placeholder="Ex: Traiteur, Costumes..."></div>
-    <button class="btn" style="width:100%;" onclick="addLinkSubmit()">Enregistrer l'idée</button>
+  <div class="modal-card">
+    <button class="close-modal" onclick="closeModalDirect()">&times;</button>
+    <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Consigner une idée ou un lien web</h3>
+    <div class="form-group"><label>Titre de l'idée / Note</label><input type="text" id="add-l-title" class="form-control" placeholder="Ex: Idées de décoration de table rustique"></div>
+    <div class="form-group"><label>Lien Web Externe (Optionnel)</label><input type="text" id="add-l-url" class="form-control" value="https://"></div>
+    <div class="form-group"><label>Étiquette / Thématique</label><input type="text" id="add-l-label" class="form-control" placeholder="Ex: Déco, Inspiration, Robe"></div>
+    <div class="form-group"><label>Description ou notes complémentaires</label><textarea id="add-l-desc" class="form-control" rows="2"></textarea></div>
+    <button class="btn" style="width:100%;" onclick="addLinkSubmit()">Mémoriser la note</button>
   </div>
 </div>
 
-<div class="toast-msg" id="toast">Opération réussie !</div>
+<div id="toast"></div>
+
+<script>
+  // --- BLOC DE SÉCURITÉ (Exécuté immédiatement avant le chargement de Firebase) ---
+  function checkLockPassword() {
+    const input = document.getElementById('lock-input').value;
+    if (input === "C&C2026") {
+      sessionStorage.setItem('dashboard_unlocked', 'true');
+      document.getElementById('lock-screen').style.display = 'none';
+      if (typeof window.toast === 'function') {
+        window.toast("Connexion établie avec Firebase Cloud");
+      }
+    } else {
+      alert("Code d'accès incorrect.");
+    }
+  }
+
+  // Vérification immédiate du statut au chargement de la page
+  if (sessionStorage.getItem('dashboard_unlocked') === 'true') {
+    const checkExist = setInterval(() => {
+      const lockScreen = document.getElementById('lock-screen');
+      if (lockScreen) {
+        lockScreen.style.display = 'none';
+        clearInterval(checkExist);
+      }
+    }, 10);
+  }
+</script>
 
 <script type="module">
-  // On importe les briques officielles Firebase Firestore depuis les réseaux CDN rapides cdnjs / unpkg
+  // On importe les briques officielles Firebase Firestore depuis les réseaux CDN rapides
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // ==========================================
-  // ⚠️ ATTENTION : REMPLACEZ CET OBJET PAR VOS PROPRES COORDONNÉES FIREBASE CONFIG
-  // ==========================================
-  //const firebaseConfig = {
-  //  apiKey: "VOTRE_API_KEY_ICI",
-  //  authDomain: "VOTRE_AUTH_DOMAIN_ICI",
-  //  projectId: "VOTRE_PROJECT_ID_ICI",
-  //  storageBucket: "VOTRE_STORAGE_BUCKET_ICI",
-  //  messagingSenderId: "VOTRE_MESSAGING_SENDER_ID_ICI",
-  //  appId: "VOTRE_APP_ID_ICI"
-  //};
-
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA12qa6k5W3ImdbaeFxLAO28mv8bl4yg-Q",
-  authDomain: "mywedding-37c60.firebaseapp.com",
-  projectId: "mywedding-37c60",
-  storageBucket: "mywedding-37c60.firebasestorage.app",
-  messagingSenderId: "748381113735",
-  appId: "1:748381113735:web:6ec3c48b0baea5f5b85722",
-  measurementId: "G-PWBYB6VG7W"
-};
-
+  // Configuration de votre application Web Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyA12qa6k5W3ImdbaeFxLAO28mv8bl4yg-Q",
+    authDomain: "mywedding-37c60.firebaseapp.com",
+    projectId: "mywedding-37c60",
+    storageBucket: "mywedding-37c60.firebasestorage.app",
+    messagingSenderId: "748381113735",
+    appId: "1:748381113735:web:6ec3c48b0baea5f5b85722",
+    measurementId: "G-PWBYB6VG7W"
+  };
 
   // Initialisation de Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // État initial de l'application (Fallback si Firebase est vide lors du tout premier démarrage)
+  // État initial de l'application
   const defaultState = {
-    coupleNames: "Clara & Clément",
-    totalBudget: 20000,
+    coupleNames: "Sophie & Thomas",
+    totalBudget: 25000,
     weddingDate: "2026-06-20",
     location: "Normandie, France",
     guests: [],
@@ -419,7 +428,6 @@ const firebaseConfig = {
   let state = { ...defaultState };
 
   // Référence unique vers le document de stockage central dans Firestore
-  // Collection : 'mariages_data', Document ID : 'general_dashboard'
   const docRef = doc(db, "mariages_data", "general_dashboard");
 
   // ==========================================
@@ -428,18 +436,15 @@ const firebaseConfig = {
   onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
       state = docSnap.data();
-      // On s'assure que les tableaux imbriqués existent bien pour éviter les bugs de lecture
       if (!state.guests) state.guests = [];
       if (!state.budget) state.budget = [];
       if (!state.vendors) state.vendors = [];
       if (!state.tasks) state.tasks = [];
       if (!state.links) state.links = [];
     } else {
-      // Si aucun document n'existe encore sur Firebase, on initialise la base avec l'état par défaut
       console.log("Initialisation du document global sur Firebase Cloud...");
       setDoc(docRef, defaultState);
     }
-    // À chaque modification distante, on redessine l'intégralité des tableaux
     renderAll();
   });
 
@@ -452,27 +457,6 @@ const firebaseConfig = {
       toast("Erreur de synchronisation réseau !");
     }
   }
-
-      // Écran de déverrouillage de session basique
-      window.checkLockPassword = function() {
-        const input = document.getElementById('lock-input').value;
-        if(input === "C&C2026") {
-          sessionStorage.setItem('dashboard_unlocked', 'true');
-          document.getElementById('lock-screen').style.display = 'none';
-          // Petite astuce : on rafraîchit pour forcer le premier rendu
-          window.location.reload();
-        } else {
-          alert("Code d'accès incorrect.");
-        }
-      };
-    
-      // Au démarrage, on vérifie si la personne a déjà déverrouillé l'écran
-      window.addEventListener('DOMContentLoaded', () => {
-        if(sessionStorage.getItem('dashboard_unlocked') === 'true') {
-          document.getElementById('lock-screen').style.display = 'none';
-        }
-      });
-
 
   // ── MOTEUR DE RENDU ET LOGIQUE COMMUNE ───────────────────────────────────────
   function renderAll() {
@@ -546,8 +530,8 @@ const firebaseConfig = {
         <td style="font-size:0.85rem; color:var(--text-muted); max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(g.notes || '-')}</td>
         <td style="text-align:right;">
           <div class="flex-actions">
-            <button class="btn btn-outline btn-sm" onclick="editGuest(${g.id})">Éditer</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteGuest(${g.id})">Suppr</button>
+            <button class="btn btn-outline btn-sm" onclick="window.editGuest(${g.id})">Éditer</button>
+            <button class="btn btn-danger btn-sm" onclick="window.deleteGuest(${g.id})">Suppr</button>
           </div>
         </td>
       `;
@@ -573,8 +557,8 @@ const firebaseConfig = {
         <td style="${diffColor}">${diff.toLocaleString('fr-FR')} €</td>
         <td style="text-align:right;">
           <div class="flex-actions">
-            <button class="btn btn-outline btn-sm" onclick="editBudget(${b.id})">Ajuster</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteBudget(${b.id})">Suppr</button>
+            <button class="btn btn-outline btn-sm" onclick="window.editBudget(${b.id})">Ajuster</button>
+            <button class="btn btn-danger btn-sm" onclick="window.deleteBudget(${b.id})">Suppr</button>
           </div>
         </td>
       `;
@@ -598,7 +582,7 @@ const firebaseConfig = {
         <td>${v.amount.toLocaleString('fr-FR')} €</td>
         <td><span class="badge ${v.status==='Contrat signé'?'badge-yes':'badge-pending'}">${v.status}</span></td>
         <td style="text-align:right;">
-          <button class="btn btn-danger btn-sm" onclick="deleteVendor(${v.id})">Supprimer</button>
+          <button class="btn btn-danger btn-sm" onclick="window.deleteVendor(${v.id})">Supprimer</button>
         </td>
       `;
       body.appendChild(tr);
@@ -621,12 +605,12 @@ const firebaseConfig = {
       const item = document.createElement('div');
       item.className = 'task-item';
       item.innerHTML = `
-        <input type="checkbox" class="task-checkbox" ${t.section==='done'?'checked':''} onclick="toggleTask(${t.id})">
+        <input type="checkbox" class="task-checkbox" ${t.section==='done'?'checked':''} onclick="window.toggleTask(${t.id})">
         <div class="task-details ${t.section==='done'?'done':''}">
           <div class="t-title" style="font-weight:500;">${escapeHtml(t.name)}</div>
           <div class="t-meta">Qui : <strong>${escapeHtml(t.owner || 'Tout le monde')}</strong> • Échéance : ${escapeHtml(t.due || 'Non fixée')} • <span style="color:var(--gold);">${escapeHtml(t.tag)}</span></div>
         </div>
-        <button class="close-modal" style="font-size:1.1rem; padding:0 5px;" onclick="deleteTask(${t.id})">&times;</button>
+        <button class="close-modal" style="font-size:1.1rem; padding:0 5px;" onclick="window.deleteTask(${t.id})">&times;</button>
       `;
       if(t.section === 'todo') todoList.appendChild(item);
       else doneList.appendChild(item);
@@ -653,15 +637,14 @@ const firebaseConfig = {
             <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">${escapeHtml(l.desc || 'Pas de description.')}</p>
             <a href="${l.url}" target="_blank" class="btn btn-outline btn-sm">Ouvrir le lien externe ↗</a>
           </div>
-          <button class="close-modal" onclick="deleteLink(${l.id})">&times;</button>
+          <button class="close-modal" onclick="window.deleteLink(${l.id})">&times;</button>
         </div>
       `;
       container.appendChild(div);
     });
   }
 
-
-  // ── OPERATIONS DE SOUMISSION DES FORMULAIRES (ÉCRITURE CLOUD) ───────────────────
+  // ── ATTACHEMENT DES MÉTHODES GLOBALISÉES POUR L'INTERFACE HTML ───────────────────
   window.addGuestSubmit = function() {
     const name = document.getElementById('add-g-name').value.trim();
     const type = document.getElementById('add-g-type').value;
@@ -669,9 +652,7 @@ const firebaseConfig = {
     const kids = parseInt(document.getElementById('add-g-kids').value) || 0;
     const status = document.getElementById('add-g-status').value;
     const notes = document.getElementById('add-g-notes').value.trim();
-
     if(!name) return toast('Le nom de famille / groupe est requis.');
-
     state.guests.push({ id: Date.now(), name, type, adults, kids, status, notes });
     saveStateToCloud();
     closeModalDirect();
@@ -719,9 +700,7 @@ const firebaseConfig = {
     const name = document.getElementById('add-b-name').value.trim();
     const allocated = parseFloat(document.getElementById('add-b-alloc').value) || 0;
     const spent = parseFloat(document.getElementById('add-b-spent').value) || 0;
-
     if(!name) return toast('L\'intitulé de la dépense est requis.');
-
     state.budget.push({ id: Date.now(), name, allocated, spent });
     saveStateToCloud();
     closeModalDirect();
@@ -763,9 +742,7 @@ const firebaseConfig = {
     const contact = document.getElementById('add-v-contact').value.trim();
     const amount = parseFloat(document.getElementById('add-v-amount').value) || 0;
     const status = document.getElementById('add-v-status').value;
-
     if(!category || !name) return toast('Veuillez remplir les champs obligatoires.');
-
     state.vendors.push({ id: Date.now(), category, name, contact, amount, status });
     saveStateToCloud();
     closeModalDirect();
@@ -786,9 +763,7 @@ const firebaseConfig = {
     const due = document.getElementById('add-t-due').value.trim();
     const tag = document.getElementById('add-t-tag').value.trim();
     const section = document.getElementById('add-t-sec').value;
-
     if(!name) return toast('L\'intitulé est indispensable.');
-
     state.tasks.push({ id: Date.now(), name, owner, due, tag: tag || 'Général', section });
     saveStateToCloud();
     closeModalDirect();
@@ -814,11 +789,9 @@ const firebaseConfig = {
     let url = document.getElementById('add-l-url').value.trim();
     const desc = document.getElementById('add-l-desc').value.trim();
     let label = document.getElementById('add-l-label').value.trim();
-
     if(!title) return toast('Le titre de l\'idée est obligatoire.');
     if(!label) label = 'Divers';
     if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
-
     state.links.push({ id: Date.now(), label, title, url, desc });
     saveStateToCloud();
     closeModalDirect();
@@ -843,20 +816,15 @@ const firebaseConfig = {
     state.totalBudget = parseFloat(document.getElementById('settings-budget').value) || defaultState.totalBudget;
     state.weddingDate = document.getElementById('settings-date').value || defaultState.weddingDate;
     state.location = document.getElementById('settings-location').value.trim();
-    
     saveStateToCloud();
     toast('Configurations sauvegardées en ligne !');
   };
 
-
-  // ── UTILITAIRES D'INTERFACES VISUELLES (NAV & MODALS) ──────────────────────────
+  // ── UTILITAIRES D'INTERFACES VISUELLES ──────────────────────────
   window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    
     document.getElementById(tabId).classList.add('active');
-    
-    // Ajoute la classe active au bon bouton de navigation
     const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
     if(btn) btn.classList.add('active');
   };
@@ -871,7 +839,6 @@ const firebaseConfig = {
 
   window.closeModalDirect = function() {
     document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
-    // Nettoie les formulaires simples d'ajout
     const inputs = ['add-g-name', 'add-g-notes', 'add-b-name', 'add-v-cat', 'add-v-name', 'add-v-contact', 'add-t-name', 'add-t-due', 'add-t-tag', 'add-l-title', 'add-l-desc', 'add-l-label'];
     inputs.forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
     const selectSec = document.getElementById('add-t-sec'); if(selectSec) selectSec.value = 'todo';
@@ -880,9 +847,11 @@ const firebaseConfig = {
 
   function toast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 2800);
+    if(t) {
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
   }
 
   function formatFrenchDate(dateStr) {
@@ -901,6 +870,9 @@ const firebaseConfig = {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+  
+  // Rendre la fonction accessible au bloc script classique du dessus
+  window.toast = toast;
 </script>
 </body>
 </html>
