@@ -122,9 +122,9 @@
     <h2 style="font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:400; margin-bottom:15px; color:var(--sage-dark);">Espace Confidentiel</h2>
     <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:25px;">Veuillez renseigner la clé d'authentification pour synchroniser le tableau de bord.</p>
     <div class="form-group">
-      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe..." style="text-align:center;" onkeypress="if(event.key==='Enter') checkLockPassword()">
+      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe..." style="text-align:center;">
     </div>
-    <button class="btn" style="width:100%; margin-top:5px;" onclick="checkLockPassword()">Se connecter</button>
+    <button id="lock-btn" class="btn" style="width:100%; margin-top:5px;">Se connecter</button>
   </div>
 </div>
 
@@ -365,30 +365,37 @@
 <div id="toast"></div>
 
 <script>
-  // --- BLOC DE SÉCURITÉ (Exécuté immédiatement avant le chargement de Firebase) ---
+  // --- BLOC DE SÉCURITÉ ---
+  var _unlocked = false;
+
   function checkLockPassword() {
-    const input = document.getElementById('lock-input').value;
-    if (input === "TEST26") {
-      sessionStorage.setItem('dashboard_unlocked', 'true');
+    var input = document.getElementById('lock-input');
+    if (!input) return;
+    if (input.value === "C&C2026") {
+      _unlocked = true;
       document.getElementById('lock-screen').style.display = 'none';
       if (typeof window.toast === 'function') {
         window.toast("Connexion établie avec Firebase Cloud");
       }
     } else {
-      alert("Code d'accès incorrect.");
+      input.value = '';
+      input.placeholder = 'Mot de passe incorrect, réessayez...';
+      input.style.borderColor = '#cc5c5c';
+      setTimeout(function() {
+        input.placeholder = 'Mot de passe...';
+        input.style.borderColor = '';
+      }, 2000);
     }
   }
 
-  // Vérification immédiate du statut au chargement de la page
-  if (sessionStorage.getItem('dashboard_unlocked') === 'true') {
-    const checkExist = setInterval(() => {
-      const lockScreen = document.getElementById('lock-screen');
-      if (lockScreen) {
-        lockScreen.style.display = 'none';
-        clearInterval(checkExist);
-      }
-    }, 10);
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('lock-btn');
+    var inp = document.getElementById('lock-input');
+    if (btn) btn.addEventListener('click', checkLockPassword);
+    if (inp) inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') checkLockPassword();
+    });
+  });
 </script>
 
 <script type="module">
