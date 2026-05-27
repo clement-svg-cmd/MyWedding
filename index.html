@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Notre Mariage - Tableau de bord Multi-Projets</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
     --ivory: #faf7f2;
@@ -26,7 +27,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Jost', sans-serif; }
   body { background-color: var(--ivory); color: var(--text); line-height: 1.6; }
 
-  /* Écran d'authentification complet */
+  /* Écran d'authentification */
   #lock-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: var(--ivory); z-index: 9999;
@@ -176,10 +177,19 @@
         <div class="stat-desc" id="dash-tasks-desc">...</div>
       </div>
     </div>
-    <div class="card" style="max-width: 500px; margin: 0 auto;">
-      <div class="card-title">Informations Majeures</div>
-      <div style="margin-bottom:10px;">Date retenue : <strong id="dash-info-date">-</strong></div>
-      <div>Lieu des festivités : <strong id="dash-info-location">-</strong></div>
+    
+    <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+      <div class="card">
+        <div class="card-title">Informations Majeures</div>
+        <div style="margin-bottom:10px;">Date retenue : <strong id="dash-info-date">-</strong></div>
+        <div style="margin-bottom:20px;">Lieu des festivités : <strong id="dash-info-location">-</strong></div>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="card-title" style="width: 100%;">Répartition des Dépenses Réelles</div>
+        <div style="width: 100%; max-width: 220px; height: 220px;">
+          <canvas id="chart-dash-budget"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -211,6 +221,22 @@
       <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:600;">Comptabilité des Coûts</h3>
       <button class="btn btn-outline" onclick="openModal('modal-add-budget')">+ Nouveau Poste</button>
     </div>
+
+    <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin: 25px 0;">
+      <div class="card" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="card-title" style="width: 100%; font-size: 1.2rem;">Dépenses Réelles vs Budget Global Cible</div>
+        <div style="width: 100%; max-width: 200px; height: 200px;">
+          <canvas id="chart-budget-vs-target"></canvas>
+        </div>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="card-title" style="width: 100%; font-size: 1.2rem;">Dépenses Réelles vs Montants Alloués</div>
+        <div style="width: 100%; max-width: 200px; height: 200px;">
+          <canvas id="chart-budget-vs-allocated"></canvas>
+        </div>
+      </div>
+    </div>
+
     <div class="table-container">
       <table>
         <thead>
@@ -324,8 +350,8 @@
     <button class="close-modal" onclick="closeModalDirect()">&times;</button>
     <h3 style="margin-bottom:15px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Nouveau poste de dépense</h3>
     <div class="form-group"><label>Intitulé de la ligne</label><input type="text" id="add-b-name" class="form-control" placeholder="Ex: Traiteur, Robe, Location de salle"></div>
-    <div class="form-group"><label>Estimation budgétaire allouée (€)</label><input type="number" id="add-b-alloc" class="form-control" value="0"></div>
-    <div class="form-group"><label>Montant déjà payé / Engagé (€)</label><input type="number" id="add-b-spent" class="form-control" value="0"></div>
+    <div class="form-group"><label>Estimation budgétaire allouée (€)</label><input type="number" id="add-b-alloc" class="form-control" placeholder="0"></div>
+    <div class="form-group"><label>Montant déjà payé / Engagé (€)</label><input type="number" id="add-b-spent" class="form-control" placeholder="0"></div>
     <button class="btn" style="width:100%;" onclick="addBudgetSubmit()">Créer la ligne</button>
   </div>
 </div>
@@ -378,12 +404,12 @@
 <div id="toast"></div>
 
 <script type="module">
-  // On importe les briques officielles Firebase Firestore et Authentication depuis le CDN
+  // Importations officielles modules Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  // Configuration de votre application Web Firebase
+  // Configuration de votre application Firebase Cloud
   const firebaseConfig = {
     apiKey: "AIzaSyA12qa6k5W3ImdbaeFxLAO28mv8bl4yg-Q",
     authDomain: "mywedding-37c60.firebaseapp.com",
@@ -394,12 +420,12 @@
     measurementId: "G-PWBYB6VG7W"
   };
 
-  // Initialisation des modules Firebase
+  // Initialisations Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  // État initial par défaut appliqué aux nouveaux comptes créés
+  // Modèle de données par défaut (appliqué aux nouveaux comptes)
   const defaultState = {
     coupleNames: "Mon Nouveau Projet",
     totalBudget: 20000,
@@ -412,23 +438,28 @@
     links: []
   };
 
-  // L'état réactif global de notre application
+  // Variables d'état global
   let state = { ...defaultState };
   let docRef = null;
-  let unsubscribeSnapshot = null; // Nettoyeur d'écouteur Firestore
-  let isSignUpMode = false; // Mode d'authentification initial
+  let unsubscribeSnapshot = null;
+  let isSignUpMode = false;
+
+  // Variables contenant les instances des graphiques Chart.js
+  let myDashChart = null;
+  let myTargetChart = null;
+  let myAllocatedChart = null;
 
   // ==========================================
-  // GESTION DU CYCLE DE SESSION (AUTH CONTROLLER)
+  // LOGIQUE DU CONTRÔLEUR D'AUTHENTIFICATION
   // ==========================================
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // L'utilisateur est connecté : On cloisonne la BDD sur son UID unique
+      // Utilisateur connecté -> On pointe vers son UID dédié dans Cloud Firestore
       docRef = doc(db, "mariages_data", user.uid);
       document.getElementById('lock-screen').style.display = 'none';
       document.getElementById('btn-logout').style.display = 'block';
 
-      // Écouteur de synchronisation en temps réel sur le document du compte
+      // Abonnement temps réel
       unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           state = docSnap.data();
@@ -438,13 +469,13 @@
           if (!state.tasks) state.tasks = [];
           if (!state.links) state.links = [];
         } else {
-          console.log("Premier compte utilisateur détecté, initialisation du projet...");
+          console.log("Initialisation d'un nouvel espace utilisateur...");
           setDoc(docRef, defaultState);
         }
         renderAll();
       });
     } else {
-      // L'utilisateur est déconnecté : Fermeture et RAZ globale
+      // Utilisateur déconnecté -> Reset général
       if (unsubscribeSnapshot) unsubscribeSnapshot();
       docRef = null;
       state = { ...defaultState };
@@ -452,38 +483,41 @@
       document.getElementById('btn-logout').style.display = 'none';
       document.getElementById('header-names').textContent = "Non connecté";
       document.getElementById('header-countdown').textContent = "Veuillez vous authentifier.";
+      
+      // Nettoyage visuel des graphiques existants lors de la déconnexion
+      if (myDashChart) { myDashChart.destroy(); myDashChart = null; }
+      if (myTargetChart) { myTargetChart.destroy(); myTargetChart = null; }
+      if (myAllocatedChart) { myAllocatedChart.destroy(); myAllocatedChart = null; }
     }
   });
 
-  // Gestion de la soumission de connexion / inscription
   window.submitAuth = async function() {
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
 
-    if (!email || !password) return alert("Veuillez remplir les deux champs demandés.");
-    if (password.length < 6) return alert("Par sécurité, votre mot de passe doit faire au moins 6 caractères.");
+    if (!email || !password) return alert("Veuillez remplir tous les champs.");
+    if (password.length < 6) return alert("Le mot de passe doit contenir au moins 6 caractères.");
 
     try {
       if (isSignUpMode) {
         await createUserWithEmailAndPassword(auth, email, password);
-        toast("Félicitations ! Votre compte et projet ont été initialisés.");
+        toast("Compte et espace créés avec succès !");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        toast("Connexion établie.");
+        toast("Connexion réussie.");
       }
     } catch (err) {
       console.error(err);
-      let errMsg = "Une erreur est survenue.";
+      let errMsg = "Une erreur s'est produite lors de l'identification.";
       if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        errMsg = "Identifiants ou mot de passe invalides.";
+        errMsg = "Identifiants invalides.";
       } else if(err.code === 'auth/email-already-in-use') {
-        errMsg = "Cette adresse email est déjà associée à un projet.";
+        errMsg = "Cet e-mail est déjà lié à un projet existant.";
       }
-      alert(errMsg + " (" + err.message + ")");
+      alert(errMsg);
     }
   };
 
-  // Basculer l'interface entre Connexion et Inscription
   window.toggleAuthMode = function(e) {
     e.preventDefault();
     isSignUpMode = !isSignUpMode;
@@ -508,25 +542,25 @@
     }
   };
 
-  // Déconnexion manuelle
   window.handleLogout = function() {
-    if(confirm("Souhaitez-vous fermer votre session de travail actuelle ?")) {
-      signOut(auth).then(() => toast("Déconnexion appliquée."));
+    if(confirm("Souhaitez-vous fermer votre session ?")) {
+      signOut(auth).then(() => toast("Déconnexion réussie."));
     }
   };
 
-  // Fonction pour expédier le nouvel état vers Firebase
   async function saveStateToCloud() {
     if (!docRef) return;
     try {
       await setDoc(docRef, state);
     } catch (err) {
-      console.error("Erreur d'écriture sur Firebase : ", err);
-      toast("Erreur de synchronisation réseau ! Vérifiez vos droits Firestore.");
+      console.error("Erreur d'écriture Cloud Firestore : ", err);
+      toast("Erreur réseau de synchronisation !");
     }
   }
 
-  // ── MOTEUR DE RENDU ET LOGIQUE COMMUNE ───────────────────────────────────────
+  // ==========================================
+  // ENGINE : SYNC & RENDU DES COMPOSANTS
+  // ==========================================
   function renderAll() {
     renderHeader();
     renderDashboard();
@@ -536,6 +570,7 @@
     renderTasks();
     renderLinks();
     fillSettingsForm();
+    updateBudgetCharts(); // Rendu des graphiques
   }
 
   function renderHeader() {
@@ -545,11 +580,11 @@
     const diff = target - now;
     const descEl = document.getElementById('header-countdown');
     if(isNaN(diff) || diff <= 0) {
-      descEl.textContent = "Jour J arrivé ou dépassé ! ✨";
+      descEl.textContent = "Le jour J est arrivé ! ✨";
       return;
     }
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    descEl.textContent = `J - ${days} jours avant notre grand jour (${formatFrenchDate(state.weddingDate)})`;
+    descEl.textContent = `J - ${days} jours avant notre mariage (${formatFrenchDate(state.weddingDate)})`;
   }
 
   function renderDashboard() {
@@ -570,10 +605,66 @@
 
     const todoTasks = state.tasks.filter(x => x.section === 'todo').length;
     document.getElementById('dash-tasks-count').textContent = state.tasks.length;
-    document.getElementById('dash-tasks-desc').textContent = `${todoTasks} tâches restant à accomplir`;
+    document.getElementById('dash-tasks-desc').textContent = `${todoTasks} actions en attente`;
 
     document.getElementById('dash-info-date').textContent = formatFrenchDate(state.weddingDate);
     document.getElementById('dash-info-location').textContent = state.location || 'Non renseigné';
+  }
+
+  // LOGIQUE DES GRAPHIQUES (CHART.JS)
+  function updateBudgetCharts() {
+    const labels = state.budget.map(b => b.name);
+    const spentData = state.budget.map(b => b.spent);
+    const totalSpent = spentData.reduce((a, b) => a + b, 0);
+    const chartColors = ['#8a9e8c', '#c9a96e', '#e8c4b8', '#b8cbb8', '#e8d5b0', '#5e7260', '#cc5c5c', '#8a8078'];
+
+    // 1. Graphique Dashboard : Répartition
+    if (myDashChart) myDashChart.destroy();
+    const ctxDash = document.getElementById('chart-dash-budget').getContext('2d');
+    myDashChart = new Chart(ctxDash, {
+      type: 'pie',
+      data: {
+        labels: totalSpent === 0 ? ['Aucune dépense'] : labels,
+        datasets: [{
+          data: totalSpent === 0 ? [1] : spentData,
+          backgroundColor: totalSpent === 0 ? ['#f0ebe1'] : chartColors
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+    });
+
+    // 2. Graphique Budget : Réel vs Cible global
+    if (myTargetChart) myTargetChart.destroy();
+    const ctxTarget = document.getElementById('chart-budget-vs-target').getContext('2d');
+    const remainingTarget = Math.max(0, state.totalBudget - totalSpent);
+    myTargetChart = new Chart(ctxTarget, {
+      type: 'doughnut',
+      data: {
+        labels: ['Dépensé Réel', 'Reste disponible'],
+        datasets: [{
+          data: [totalSpent, remainingTarget],
+          backgroundColor: ['#cc5c5c', '#e3ede4']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // 3. Graphique Budget : Réel vs Somme des Alloués
+    if (myAllocatedChart) myAllocatedChart.destroy();
+    const ctxAlloc = document.getElementById('chart-budget-vs-allocated').getContext('2d');
+    const totalAllocated = state.budget.reduce((a, b) => a + b.allocated, 0);
+    const remainingAllocated = Math.max(0, totalAllocated - totalSpent);
+    myAllocatedChart = new Chart(ctxAlloc, {
+      type: 'doughnut',
+      data: {
+        labels: ['Payé / Engagé', 'Reste à payer sur l\'alloué'],
+        datasets: [{
+          data: [totalSpent, remainingAllocated],
+          backgroundColor: ['#c9a96e', '#faf7f2']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
   }
 
   function renderGuests() {
@@ -648,7 +739,7 @@
         <td style="font-weight:500;">${escapeHtml(v.name)}</td>
         <td style="font-size:0.85rem;">${escapeHtml(v.contact || '-')}</td>
         <td>${v.amount.toLocaleString('fr-FR')} €</td>
-        <td><span class="badge ${v.status==='Contrat signé'?'badge-yes':'badge-pending'}">${v.status}</span></td>
+        <td><span class="badge ${v.status==='Contrat signed' || v.status==='Contrat signé' ?'badge-yes':'badge-pending'}">${v.status}</span></td>
         <td style="text-align:right;">
           <button class="btn btn-danger btn-sm" onclick="window.deleteVendor(${v.id})">Supprimer</button>
         </td>
@@ -712,7 +803,9 @@
     });
   }
 
-  // ── ATTACHEMENT DES MÉTHODES GLOBALISÉES POUR L'INTERFACE HTML ───────────────────
+  // ==========================================
+  // ATTACHEMENT DES FONCTIONS INTERFACES (WINDOW)
+  // ==========================================
   window.addGuestSubmit = function() {
     const name = document.getElementById('add-g-name').value.trim();
     const type = document.getElementById('add-g-type').value;
@@ -720,11 +813,11 @@
     const kids = parseInt(document.getElementById('add-g-kids').value) || 0;
     const status = document.getElementById('add-g-status').value;
     const notes = document.getElementById('add-g-notes').value.trim();
-    if(!name) return toast('Le nom de famille / groupe est requis.');
+    if(!name) return toast('Le nom du groupe est requis.');
     state.guests.push({ id: Date.now(), name, type, adults, kids, status, notes });
     saveStateToCloud();
     closeModalDirect();
-    toast('Groupe d\'invités ajouté au Cloud !');
+    toast('Invité enregistré !');
   };
 
   window.editGuest = function(id) {
@@ -752,12 +845,12 @@
       g.notes = document.getElementById('edit-g-notes').value.trim();
       saveStateToCloud();
       closeModalDirect();
-      toast('Fiche invité mise à jour !');
+      toast('Fiche mise à jour !');
     }
   };
 
   window.deleteGuest = function(id) {
-    if(confirm("Supprimer cet invité définitivement de la base Cloud ?")) {
+    if(confirm("Supprimer cet invité ?")) {
       state.guests = state.guests.filter(x => x.id !== id);
       saveStateToCloud();
       toast('Invité supprimé.');
@@ -772,7 +865,7 @@
     state.budget.push({ id: Date.now(), name, allocated, spent });
     saveStateToCloud();
     closeModalDirect();
-    toast('Poste de dépense ajouté.');
+    toast('Poste budgétaire ajouté !');
   };
 
   window.editBudget = function(id) {
@@ -792,15 +885,15 @@
       b.spent = parseFloat(document.getElementById('edit-b-spent').value) || 0;
       saveStateToCloud();
       closeModalDirect();
-      toast('Budget actualisé !');
+      toast('Budget actualisé.');
     };
   };
 
   window.deleteBudget = function(id) {
-    if(confirm("Supprimer ce poste de dépense ?")) {
+    if(confirm("Supprimer cette ligne ?")) {
       state.budget = state.budget.filter(x => x.id !== id);
       saveStateToCloud();
-      toast('Poste budgétaire supprimé.');
+      toast('Ligne supprimée.');
     }
   };
 
@@ -814,14 +907,14 @@
     state.vendors.push({ id: Date.now(), category, name, contact, amount, status });
     saveStateToCloud();
     closeModalDirect();
-    toast('Prestataire enregistré !');
+    toast('Prestataire enregistré.');
   };
 
   window.deleteVendor = function(id) {
-    if(confirm("Retirer ce prestataire de la liste ?")) {
+    if(confirm("Retirer ce prestataire ?")) {
       state.vendors = state.vendors.filter(x => x.id !== id);
       saveStateToCloud();
-      toast('Prestataire effacé.');
+      toast('Prestataire retiré.');
     }
   };
 
@@ -831,11 +924,11 @@
     const due = document.getElementById('add-t-due').value.trim();
     const tag = document.getElementById('add-t-tag').value.trim();
     const section = document.getElementById('add-t-sec').value;
-    if(!name) return toast('L\'intitulé est indispensable.');
+    if(!name) return toast('L\'intitulé est obligatoire.');
     state.tasks.push({ id: Date.now(), name, owner, due, tag: tag || 'Général', section });
     saveStateToCloud();
     closeModalDirect();
-    toast('Action ajoutée au planning.');
+    toast('Action ajoutée.');
   };
 
   window.toggleTask = function(id) {
@@ -849,7 +942,7 @@
   window.deleteTask = function(id) {
     state.tasks = state.tasks.filter(x => x.id !== id);
     saveStateToCloud();
-    toast('Tâche retirée.');
+    toast('Action retirée.');
   };
 
   window.addLinkSubmit = function() {
@@ -859,17 +952,17 @@
     let label = document.getElementById('add-l-label').value.trim();
     if(!title) return toast('Le titre de l\'idée est obligatoire.');
     if(!label) label = 'Divers';
-    if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
     state.links.push({ id: Date.now(), label, title, url, desc });
     saveStateToCloud();
     closeModalDirect();
-    toast('Idée consignée !');
+    toast('Idée mémorisée !');
   };
 
   window.deleteLink = function(id) {
     state.links = state.links.filter(x => x.id !== id);
     saveStateToCloud();
-    toast('Note supprimée.');
+    toast('Note effacée.');
   };
 
   window.fillSettingsForm = function() {
@@ -885,10 +978,10 @@
     state.weddingDate = document.getElementById('settings-date').value || defaultState.weddingDate;
     state.location = document.getElementById('settings-location').value.trim();
     saveStateToCloud();
-    toast('Configurations sauvegardées en ligne !');
+    toast('Configurations sauvegardées !');
   };
 
-  // ── UTILITAIRES D'INTERFACES VISUELLES ──────────────────────────
+  // UI : Onglets & Modales
   window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -908,15 +1001,14 @@
   window.closeModalDirect = function() {
     document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
     
-    // Liste des champs texte à vider
+    // Nettoyage des formulaires textes
     const inputs = ['add-g-name', 'add-g-notes', 'add-b-name', 'add-v-cat', 'add-v-name', 'add-v-contact', 'add-t-name', 'add-t-due', 'add-t-tag', 'add-l-title', 'add-l-desc', 'add-l-label'];
     inputs.forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
     
-    // NOUVEAU : Réinitialisation des champs numériques du budget à vide
+    // CORRECTION : Nettoyage complet à vide des inputs de budget numériques
     const budgetInputs = ['add-b-alloc', 'add-b-spent'];
     budgetInputs.forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
 
-    // Réinitialisation des sélecteurs par défaut
     const selectSec = document.getElementById('add-t-sec'); if(selectSec) selectSec.value = 'todo';
     const linkUrl = document.getElementById('add-l-url'); if(linkUrl) linkUrl.value = 'https://';
   };
@@ -947,7 +1039,6 @@
       .replace(/'/g, "&#039;");
   }
   
-  // Rendre le toast disponible globalement
   window.toast = toast;
 </script>
 </body>
