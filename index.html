@@ -907,8 +907,16 @@
 
   window.closeModalDirect = function() {
     document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+    
+    // Liste des champs texte à vider
     const inputs = ['add-g-name', 'add-g-notes', 'add-b-name', 'add-v-cat', 'add-v-name', 'add-v-contact', 'add-t-name', 'add-t-due', 'add-t-tag', 'add-l-title', 'add-l-desc', 'add-l-label'];
     inputs.forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
+    
+    // NOUVEAU : Réinitialisation des champs numériques du budget à vide
+    const budgetInputs = ['add-b-alloc', 'add-b-spent'];
+    budgetInputs.forEach(i => { const el = document.getElementById(i); if(el) el.value = ''; });
+
+    // Réinitialisation des sélecteurs par défaut
     const selectSec = document.getElementById('add-t-sec'); if(selectSec) selectSec.value = 'todo';
     const linkUrl = document.getElementById('add-l-url'); if(linkUrl) linkUrl.value = 'https://';
   };
