@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Notre Mariage - Tableau de bord Cloud</title>
+<title>Notre Mariage - Tableau de bord Multi-Projets</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -26,7 +26,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Jost', sans-serif; }
   body { background-color: var(--ivory); color: var(--text); line-height: 1.6; }
 
-  /* Écran de verrouillage fixe */
+  /* Écran d'authentification complet */
   #lock-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: var(--ivory); z-index: 9999;
@@ -39,7 +39,7 @@
   }
 
   /* Structure Application */
-  header { background: var(--white); padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--ivory-dark); box-shadow: var(--shadow); }
+  header { background: var(--white); padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--ivory-dark); box-shadow: var(--shadow); position: relative; }
   header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 400; color: var(--sage-dark); margin-bottom: 5px; }
   header p { font-size: 1rem; color: var(--text-muted); letter-spacing: 0.5px; }
 
@@ -63,7 +63,7 @@
   .stat-desc { font-size: 0.85rem; color: var(--text-muted); }
 
   /* Formulaires et Boutons */
-  .form-group { margin-bottom: 15px; }
+  .form-group { margin-bottom: 15px; text-align: left; }
   .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--ivory-dark); background-color: var(--ivory); border-radius: 6px; font-size: 0.95rem; color: var(--text); transition: border-color 0.2s; }
   .form-control:focus { outline: none; border-color: var(--sage); background-color: var(--white); }
@@ -80,7 +80,7 @@
   .table-container { background: var(--white); border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; margin-top: 20px; border: 1px solid rgba(240,235,225,0.6); }
   table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
   th, td { padding: 14px 20px; border-bottom: 1px solid var(--ivory-dark); }
-  th { background-color: rgba(24faf2, 247, 242, 0.5); font-weight: 500; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  th { background-color: rgba(250, 247, 242, 0.5); font-weight: 500; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
   tr:last-child td { border-bottom: none; }
   
   .badge { display: inline-block; padding: 3px 8px; font-size: 0.75rem; font-weight: 500; border-radius: 4px; }
@@ -119,18 +119,31 @@
 
 <div id="lock-screen">
   <div class="lock-card">
-    <h2 style="font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:400; margin-bottom:15px; color:var(--sage-dark);">Espace Confidentiel</h2>
-    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:25px;">Veuillez renseigner la clé d'authentification pour synchroniser le tableau de bord.</p>
+    <h2 id="auth-title" style="font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:400; margin-bottom:15px; color:var(--sage-dark);">Connexion à votre Espace</h2>
+    <p id="auth-subtitle" style="font-size:0.9rem; color:var(--text-muted); margin-bottom:25px;">Veuillez renseigner vos identifiants pour synchroniser votre tableau de bord.</p>
+    
     <div class="form-group">
-      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe..." style="text-align:center;">
+      <label>Adresse Email</label>
+      <input type="email" id="auth-email" class="form-control" placeholder="exemple@mariage.com">
     </div>
-    <button id="lock-btn" class="btn" style="width:100%; margin-top:5px;">Se connecter</button>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="auth-password" class="form-control" placeholder="******" onkeypress="if(event.key==='Enter') window.submitAuth()">
+    </div>
+    
+    <button class="btn" style="width:100%; margin-top:5px;" id="btn-primary-auth" onclick="window.submitAuth()">Se connecter</button>
+    
+    <p style="margin-top:20px; font-size:0.85rem; color:var(--text-muted);">
+      <span id="auth-toggle-text">Pas encore de compte ?</span> 
+      <a href="#" id="auth-toggle-link" style="color:var(--sage-dark); font-weight:500;" onclick="window.toggleAuthMode(event)">Créer un projet</a>
+    </p>
   </div>
 </div>
 
 <header>
   <h1 id="header-names">Chargement...</h1>
   <p id="header-countdown">Connexion au réseau Firebase Cloud...</p>
+  <button class="btn btn-outline btn-sm" id="btn-logout" style="position: absolute; top: 30px; right: 20px; display:none;" onclick="window.handleLogout()">Déconnexion</button>
 </header>
 
 <nav class="nav-tabs">
@@ -364,44 +377,11 @@
 
 <div id="toast"></div>
 
-<script>
-  // --- BLOC DE SÉCURITÉ ---
-  var _unlocked = false;
-
-  function checkLockPassword() {
-    var input = document.getElementById('lock-input');
-    if (!input) return;
-    if (input.value === "C&C2026") {
-      _unlocked = true;
-      document.getElementById('lock-screen').style.display = 'none';
-      if (typeof window.toast === 'function') {
-        window.toast("Connexion établie avec Firebase Cloud");
-      }
-    } else {
-      input.value = '';
-      input.placeholder = 'Mot de passe incorrect, réessayez...';
-      input.style.borderColor = '#cc5c5c';
-      setTimeout(function() {
-        input.placeholder = 'Mot de passe...';
-        input.style.borderColor = '';
-      }, 2000);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('lock-btn');
-    var inp = document.getElementById('lock-input');
-    if (btn) btn.addEventListener('click', checkLockPassword);
-    if (inp) inp.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') checkLockPassword();
-    });
-  });
-</script>
-
 <script type="module">
-  // On importe les briques officielles Firebase Firestore depuis les réseaux CDN rapides
+  // On importe les briques officielles Firebase Firestore et Authentication depuis le CDN
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   // Configuration de votre application Web Firebase
   const firebaseConfig = {
@@ -414,16 +394,17 @@
     measurementId: "G-PWBYB6VG7W"
   };
 
-  // Initialisation de Firebase
+  // Initialisation des modules Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
 
-  // État initial de l'application
+  // État initial par défaut appliqué aux nouveaux comptes créés
   const defaultState = {
-    coupleNames: "Sophie & Thomas",
-    totalBudget: 25000,
-    weddingDate: "2026-06-20",
-    location: "Normandie, France",
+    coupleNames: "Mon Nouveau Projet",
+    totalBudget: 20000,
+    weddingDate: "2026-09-05",
+    location: "À renseigner",
     guests: [],
     budget: [],
     vendors: [],
@@ -433,35 +414,115 @@
 
   // L'état réactif global de notre application
   let state = { ...defaultState };
-
-  // Référence unique vers le document de stockage central dans Firestore
-  const docRef = doc(db, "mariages_data", "general_dashboard");
+  let docRef = null;
+  let unsubscribeSnapshot = null; // Nettoyeur d'écouteur Firestore
+  let isSignUpMode = false; // Mode d'authentification initial
 
   // ==========================================
-  // SYNCHRONISATION EN TEMPS RÉEL (FIRESTORE -> FRONTEND)
+  // GESTION DU CYCLE DE SESSION (AUTH CONTROLLER)
   // ==========================================
-  onSnapshot(docRef, (docSnap) => {
-    if (docSnap.exists()) {
-      state = docSnap.data();
-      if (!state.guests) state.guests = [];
-      if (!state.budget) state.budget = [];
-      if (!state.vendors) state.vendors = [];
-      if (!state.tasks) state.tasks = [];
-      if (!state.links) state.links = [];
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // L'utilisateur est connecté : On cloisonne la BDD sur son UID unique
+      docRef = doc(db, "mariages_data", user.uid);
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('btn-logout').style.display = 'block';
+
+      // Écouteur de synchronisation en temps réel sur le document du compte
+      unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          state = docSnap.data();
+          if (!state.guests) state.guests = [];
+          if (!state.budget) state.budget = [];
+          if (!state.vendors) state.vendors = [];
+          if (!state.tasks) state.tasks = [];
+          if (!state.links) state.links = [];
+        } else {
+          console.log("Premier compte utilisateur détecté, initialisation du projet...");
+          setDoc(docRef, defaultState);
+        }
+        renderAll();
+      });
     } else {
-      console.log("Initialisation du document global sur Firebase Cloud...");
-      setDoc(docRef, defaultState);
+      // L'utilisateur est déconnecté : Fermeture et RAZ globale
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      docRef = null;
+      state = { ...defaultState };
+      document.getElementById('lock-screen').style.display = 'flex';
+      document.getElementById('btn-logout').style.display = 'none';
+      document.getElementById('header-names').textContent = "Non connecté";
+      document.getElementById('header-countdown').textContent = "Veuillez vous authentifier.";
     }
-    renderAll();
   });
+
+  // Gestion de la soumission de connexion / inscription
+  window.submitAuth = async function() {
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+
+    if (!email || !password) return alert("Veuillez remplir les deux champs demandés.");
+    if (password.length < 6) return alert("Par sécurité, votre mot de passe doit faire au moins 6 caractères.");
+
+    try {
+      if (isSignUpMode) {
+        await createUserWithEmailAndPassword(auth, email, password);
+        toast("Félicitations ! Votre compte et projet ont été initialisés.");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        toast("Connexion établie.");
+      }
+    } catch (err) {
+      console.error(err);
+      let errMsg = "Une erreur est survenue.";
+      if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        errMsg = "Identifiants ou mot de passe invalides.";
+      } else if(err.code === 'auth/email-already-in-use') {
+        errMsg = "Cette adresse email est déjà associée à un projet.";
+      }
+      alert(errMsg + " (" + err.message + ")");
+    }
+  };
+
+  // Basculer l'interface entre Connexion et Inscription
+  window.toggleAuthMode = function(e) {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    const title = document.getElementById('auth-title');
+    const subtitle = document.getElementById('auth-subtitle');
+    const btn = document.getElementById('btn-primary-auth');
+    const txt = document.getElementById('auth-toggle-text');
+    const link = document.getElementById('auth-toggle-link');
+
+    if (isSignUpMode) {
+      title.textContent = "Créer un nouveau Projet";
+      subtitle.textContent = "Inscrivez un compte pour générer un nouvel espace indépendant.";
+      btn.textContent = "Créer mon espace & projet";
+      txt.textContent = "Vous possédez déjà un compte ?";
+      link.textContent = "Se connecter";
+    } else {
+      title.textContent = "Connexion à votre Espace";
+      subtitle.textContent = "Veuillez renseigner vos identifiants pour synchroniser votre tableau de bord.";
+      btn.textContent = "Se connecter";
+      txt.textContent = "Pas encore de compte ?";
+      link.textContent = "Créer un projet";
+    }
+  };
+
+  // Déconnexion manuelle
+  window.handleLogout = function() {
+    if(confirm("Souhaitez-vous fermer votre session de travail actuelle ?")) {
+      signOut(auth).then(() => toast("Déconnexion appliquée."));
+    }
+  };
 
   // Fonction pour expédier le nouvel état vers Firebase
   async function saveStateToCloud() {
+    if (!docRef) return;
     try {
       await setDoc(docRef, state);
     } catch (err) {
       console.error("Erreur d'écriture sur Firebase : ", err);
-      toast("Erreur de synchronisation réseau !");
+      toast("Erreur de synchronisation réseau ! Vérifiez vos droits Firestore.");
     }
   }
 
@@ -878,7 +939,7 @@
       .replace(/'/g, "&#039;");
   }
   
-  // Rendre la fonction accessible au bloc script classique du dessus
+  // Rendre le toast disponible globalement
   window.toast = toast;
 </script>
 </body>
