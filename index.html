@@ -138,6 +138,7 @@
   <button class="tab-btn" onclick="switchTab('prestataires')">Prestataires</button>
   <button class="tab-btn" onclick="switchTab('taches')">Planning</button>
   <button class="tab-btn" onclick="switchTab('idees')">Idées & Liens</button>
+  <button class="tab-btn" onclick="switchTab('gemini-ia')">Assistant IA</button>
   <button class="tab-btn" onclick="switchTab('config-tab')">Paramètres</button>
 </nav>
 
@@ -171,17 +172,6 @@
     </div>
   </div>
 
-  //Integration IA
-  <div class="card">
-    <h3>Assistant IA de Mariage</h3>
-    <div class="form-group">
-      <input type="text" id="ia-prompt" class="form-control" placeholder="Ex: Donne-moi 3 idées d'animations originales pour le vin d'honneur...">
-    </div>
-    <button class="btn btn-gold" onclick="genererIdeeIA()">Demander à Gemini</button>
-    <p id="ia-reponse" style="margin-top: 15px; font-style: italic; color: var(--text); white-space: pre-line;"></p>
-  </div>
-
-  
   <div id="invites" class="tab-content">
     <div class="section-title-area">
       <h2 style="font-size:2.2rem;">Liste des Invités</h2>
@@ -287,6 +277,25 @@
       <button class="btn" onclick="openModal('modal-add-link')">Ajouter une idée</button>
     </div>
     <div id="links-container" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"></div>
+  </div>
+
+  <div id="gemini-ia" class="tab-content">
+    <h2 style="font-size:2.2rem; margin-bottom:25px;">Assistant IA - Gemini Cloud</h2>
+    <div class="card" style="max-width:800px;">
+      <h3 style="font-size:1.4rem; margin-bottom:15px; border-bottom:none; padding-bottom:0;">Posez vos questions d'organisation</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Besoin d'idées de textes, de suggestions d'animations ou de conseils pour le planning ? Gemini vous répond en direct.</p>
+      
+      <div class="form-group">
+        <label>Votre demande à l'IA</label>
+        <textarea id="ia-prompt" class="form-control" rows="4" placeholder="Ex: Donne-moi 3 idées d'animations originales et élégantes pour occuper les enfants pendant le repas..."></textarea>
+      </div>
+      <button class="btn btn-gold" id="btn-call-ia" onclick="askGeminiIA()">Demander à l'assistant Gemini</button>
+
+      <div id="ia-response-box" class="card" style="margin-top:30px; background-color:var(--ivory); display:none; border-left:4px solid var(--gold);">
+        <h4 style="font-family:'Jost', sans-serif; font-weight:500; text-transform:uppercase; font-size:0.8rem; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px;">Réponse de Gemini :</h4>
+        <p id="ia-reponse" style="white-space: pre-wrap; font-size:1rem; color:var(--text); line-height:1.7;"></p>
+      </div>
+    </div>
   </div>
 
   <div id="config-tab" class="tab-content">
@@ -398,6 +407,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  // Importation du SDK officiel Google Gen AI (Utilisé de manière isolée pour sécuriser le site)
+  import { GoogleGenAI } from "https://esm.run/@google/genai";
 
   // Configuration de l'application Firebase
   const firebaseConfig = {
@@ -458,35 +469,7 @@
       toast("Erreur de synchronisation réseau !");
     }
   }
-  
-  // Importation du SDK officiel Google Gen AI
-  import { GoogleGenAI } from "https://esm.run/@google/genai";
-  
-  window.genererIdeeIA = async function() {
-    const promptInput = document.getElementById('ia-prompt').value.trim();
-    const reponseEl = document.getElementById('ia-reponse');
-    
-    if(!promptInput) return;
-    
-    reponseEl.textContent = "L'IA réfléchit...";
-  
-    try {
-      // Déclaration du client (ATTENTION : Expose la clé si mis en ligne)
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyBcFSQZGy9PQJbteHZGhfSNrrJTbyb7VCg" });
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash", // Modèle ultra-rapide et économique
-        contents: promptInput,
-      });
-  
-      reponseEl.textContent = response.text;
-    } catch (error) {
-      console.error("Erreur Gemini :", error);
-      reponseEl.textContent = "Erreur lors de la génération de la réponse.";
-    }
-  };
 
-  
   // Écran de déverrouillage
   window.checkLockPassword = function() {
     const input = document.getElementById('lock-input').value;
@@ -515,7 +498,6 @@
     renderTasks();
     renderLinks();
     fillSettingsForm();
-    // Met à jour les Donuts à chaque actualisation des données de l'état réactif
     updateBudgetCharts();
   }
 
@@ -572,6 +554,41 @@
       }
     });
   }
+
+  // LOGIQUE DE COMMUNICATON AVEC GEMINI IA
+  window.askGeminiIA = async function() {
+    const promptInput = document.getElementById('ia-prompt').value.trim();
+    const reponseText = document.getElementById('ia-reponse');
+    const responseBox = document.getElementById('ia-response-box');
+    const btnIa = document.getElementById('btn-call-ia');
+
+    if(!promptInput) return toast("Veuillez saisir une question avant de valider.");
+
+    responseBox.style.display = 'block';
+    reponseText.innerHTML = "<em>L'assistant Gemini analyse votre demande et génère une réponse...</em>";
+    btnIa.disabled = true;
+
+    try {
+      // Configuration isolée du client Gemini (Remplacez par votre clé)
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyBcFSQZGy9PQJbteHZGhfSNrrJTbyb7VCg" });
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: promptInput,
+      });
+
+      if(response && response.text) {
+        reponseText.textContent = response.text;
+      } else {
+        reponseText.textContent = "Aucune réponse n'a pu être retournée par le modèle.";
+      }
+    } catch (error) {
+      console.error("Erreur Gemini :", error);
+      reponseText.innerHTML = "<span style='color:#cc5c5c;'>⚠️ Échec de génération. Assurez-vous d'avoir inséré une clé API valide à la ligne 419 du script ou vérifiez votre connexion réseau.</span>";
+    } finally {
+      btnIa.disabled = false;
+    }
+  };
 
   function renderHeader() {
     document.getElementById('header-names').textContent = state.coupleNames;
@@ -944,8 +961,8 @@
     const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
     if(btn) btn.classList.add('active');
 
-    // Redessine instantanément les donuts si l'utilisateur bascule sur l'onglet budget
-    if (tabId === 'budget-tab') {
+    // Redessine instantanément les donuts si l'utilisateur bascule sur l'onglet budget ou général
+    if (tabId === 'budget-tab' || tabId === 'vue-generale') {
       updateBudgetCharts();
     }
   };
