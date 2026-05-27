@@ -171,6 +171,17 @@
     </div>
   </div>
 
+  //Integration IA
+  <div class="card">
+    <h3>Assistant IA de Mariage</h3>
+    <div class="form-group">
+      <input type="text" id="ia-prompt" class="form-control" placeholder="Ex: Donne-moi 3 idées d'animations originales pour le vin d'honneur...">
+    </div>
+    <button class="btn btn-gold" onclick="genererIdeeIA()">Demander à Gemini</button>
+    <p id="ia-reponse" style="margin-top: 15px; font-style: italic; color: var(--text); white-space: pre-line;"></p>
+  </div>
+
+  
   <div id="invites" class="tab-content">
     <div class="section-title-area">
       <h2 style="font-size:2.2rem;">Liste des Invités</h2>
@@ -447,7 +458,35 @@
       toast("Erreur de synchronisation réseau !");
     }
   }
+  
+  // Importation du SDK officiel Google Gen AI
+  import { GoogleGenAI } from "https://esm.run/@google/genai";
+  
+  window.genererIdeeIA = async function() {
+    const promptInput = document.getElementById('ia-prompt').value.trim();
+    const reponseEl = document.getElementById('ia-reponse');
+    
+    if(!promptInput) return;
+    
+    reponseEl.textContent = "L'IA réfléchit...";
+  
+    try {
+      // Déclaration du client (ATTENTION : Expose la clé si mis en ligne)
+      const ai = new GoogleGenAI({ apiKey: "VOTRE_CLE_API_GEMINI" });
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash", // Modèle ultra-rapide et économique
+        contents: promptInput,
+      });
+  
+      reponseEl.textContent = response.text;
+    } catch (error) {
+      console.error("Erreur Gemini :", error);
+      reponseEl.textContent = "Erreur lors de la génération de la réponse.";
+    }
+  };
 
+  
   // Écran de déverrouillage
   window.checkLockPassword = function() {
     const input = document.getElementById('lock-input').value;
