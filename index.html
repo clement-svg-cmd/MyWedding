@@ -6,7 +6,6 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Notre Mariage - Tableau de bord Cloud</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- Inclusion de Chart.js pour l'affichage des Donuts de budget -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
@@ -39,7 +38,7 @@
   .tab-btn:hover { color: var(--sage); }
   .tab-btn.active { color: var(--text); border-bottom-color: var(--gold); font-weight: 500; }
   
-  .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: none; } /* Caché par défaut tant qu'on n'est pas loggé */
+  .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
   .tab-content { display: none; }
   .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
   
@@ -78,6 +77,7 @@
   .progress-bar-container { background-color: var(--ivory-dark); height: 8px; border-radius: 4px; width: 100%; margin-top: 10px; overflow: hidden; }
   .progress-bar { background-color: var(--gold); height: 100%; width: 0%; transition: width 0.5s ease; }
   
+  /* Layout spécifique pour la zone des donuts */
   .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
   @media (max-width: 768px) { .charts-wrapper { grid-template-columns: 1fr; } }
   .chart-container { position: relative; height: 260px; width: 100%; margin-top: 15px; }
@@ -109,236 +109,200 @@
   .t-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .link-card { border-left: 3px solid var(--gold); padding-left: 15px; margin-bottom: 15px; }
   
-  /* Écran de login Firebase Auth */
-  #auth-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:var(--ivory); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-  .auth-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: var(--shadow-lg); text-align:center; max-width:420px; width:90%; border: 1px solid var(--ivory-dark); }
-  .auth-box h2 { margin-bottom:8px; font-size:2.2rem; font-style: italic; }
-  .auth-box p { font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-bottom:25px; }
+  #lock-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background:#faf7f2; z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:sans-serif; }
+  .lock-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); text-align:center; max-width:400px; width:90%; }
+  .lock-box h2 { margin-bottom:20px; font-size:1.8rem; font-family:'Cormorant Garamond', serif; }
 </style>
 </head>
 <body>
 
-<!-- ÉCRAN D'AUTHENTIFICATION FIREBASE AUTH -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <h2>Espace Privé</h2>
-    <p>Gestion du Mariage</p>
-    <div class="form-group" style="text-align:left;">
-      <label>Adresse e-mail</label>
-      <input type="email" id="auth-email" class="form-control" placeholder="exemple@mail.com">
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>Espace Confidentiel</h2>
+    <div class="form-group">
+      <input type="password" id="lock-input" class="form-control" placeholder="Mot de passe d'accès..." style="text-align:center;">
     </div>
-    <div class="form-group" style="text-align:left;">
-      <label>Mot de passe</label>
-      <input type="password" id="auth-password" class="form-control" placeholder="••••••••">
-    </div>
-    <button class="btn btn-gold" id="btn-login" style="width:100%; margin-top:10px;" onclick="loginWithFirebase()">Se connecter</button>
+    <button class="btn btn-gold" style="width:100%;" onclick="checkLockPassword()">Entrer</button>
   </div>
 </div>
 
-<div id="main-app-content" style="display:none;">
-  <header>
-    <h1 id="header-names">... & ...</h1>
-    <p id="header-countdown">Chargement du compte à rebours...</p>
-  </header>
+<header>
+  <h1 id="header-names">... & ...</h1>
+  <p id="header-countdown">Chargement du compte à rebours...</p>
+</header>
 
-  <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('vue-generale')">Général</button>
-    <button class="tab-btn" onclick="switchTab('invites')">Invités</button>
-    <button class="tab-btn" onclick="switchTab('budget-tab')">Budget</button>
-    <button class="tab-btn" onclick="switchTab('prestataires')">Prestataires</button>
-    <button class="tab-btn" onclick="switchTab('taches')">Planning</button>
-    <button class="tab-btn" onclick="switchTab('idees')">Idées & Liens</button>
-    <button class="tab-btn" onclick="switchTab('gemini-ia')">Assistant IA</button>
-    <button class="tab-btn" onclick="switchTab('config-tab')">Paramètres</button>
-  </nav>
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('vue-generale')">Général</button>
+  <button class="tab-btn" onclick="switchTab('invites')">Invités</button>
+  <button class="tab-btn" onclick="switchTab('budget-tab')">Budget</button>
+  <button class="tab-btn" onclick="switchTab('prestataires')">Prestataires</button>
+  <button class="tab-btn" onclick="switchTab('taches')">Planning</button>
+  <button class="tab-btn" onclick="switchTab('idees')">Idées & Liens</button>
+  <button class="tab-btn" onclick="switchTab('config-tab')">Paramètres</button>
+</nav>
 
-  <div class="container" id="app-container" style="display:block;">
-    
-    <div id="vue-generale" class="tab-content active">
-      <div class="grid-3">
-        <div class="card">
-          <h3>Invités <span style="font-size: 1rem; color: var(--sage);">👥</span></h3>
-          <div class="stat-number" id="dash-guests-count">0</div>
-          <div class="stat-desc" id="dash-guests-desc">0 confirmés • 0 enfants</div>
-        </div>
-        <div class="card">
-          <h3>Budget <span style="font-size: 1rem; color: var(--gold);">💶</span></h3>
-          <div class="stat-number" id="dash-budget-spent">0 €</div>
-          <div class="stat-desc" id="dash-budget-desc">Sur un total de 0 €</div>
-          <div class="progress-bar-container"><div class="progress-bar" id="dash-budget-bar"></div></div>
-        </div>
-        <div class="card">
-          <h3>Tâches <span style="font-size: 1rem; color: var(--blush);">📋</span></h3>
-          <div class="stat-number" id="dash-tasks-count">0</div>
-          <div class="stat-desc" id="dash-tasks-desc">0 restantes</div>
+<div class="container">
+  
+  <div id="vue-generale" class="tab-content active">
+    <div class="grid-3">
+      <div class="card">
+        <h3>Invités <span style="font-size: 1rem; color: var(--sage);">👥</span></h3>
+        <div class="stat-number" id="dash-guests-count">0</div>
+        <div class="stat-desc" id="dash-guests-desc">0 confirmés • 0 enfants</div>
+      </div>
+      <div class="card">
+        <h3>Budget <span style="font-size: 1rem; color: var(--gold);">💶</span></h3>
+        <div class="stat-number" id="dash-budget-spent">0 €</div>
+        <div class="stat-desc" id="dash-budget-desc">Sur un total de 0 €</div>
+        <div class="progress-bar-container"><div class="progress-bar" id="dash-budget-bar"></div></div>
+      </div>
+      <div class="card">
+        <h3>Tâches <span style="font-size: 1rem; color: var(--blush);">📋</span></h3>
+        <div class="stat-number" id="dash-tasks-count">0</div>
+        <div class="stat-desc" id="dash-tasks-desc">0 restantes</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Informations Générales</h3>
+      <table style="margin-top:10px;">
+        <tr><td style="font-weight:500; width:30%;">Date retenue :</td><td id="dash-info-date">-</td></tr>
+        <tr><td style="font-weight:500;">Lieu de réception :</td><td id="dash-info-location">-</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div id="invites" class="tab-content">
+    <div class="section-title-area">
+      <h2 style="font-size:2.2rem;">Liste des Invités</h2>
+      <button class="btn" onclick="openModal('modal-add-guest')">Ajouter un groupe / invité</button>
+    </div>
+    <div class="card" style="padding:15px; overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom / Foyer</th>
+            <th>Type</th>
+            <th>Adultes</th>
+            <th>Enfants</th>
+            <th>Présence</th>
+            <th>Régime / Notes</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-guests-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="budget-tab" class="tab-content">
+    <div class="section-title-area">
+      <h2 style="font-size:2.2rem;">Postes Budgétaires</h2>
+      <button class="btn" onclick="openModal('modal-add-budget')">Ajouter un poste</button>
+    </div>
+
+    <div class="charts-wrapper">
+      <div class="card">
+        <h3 style="font-size: 1.3rem;">Réel Dépensé vs Reste Global</h3>
+        <div class="chart-container">
+          <canvas id="chart-budget-vs-target"></canvas>
         </div>
       </div>
       <div class="card">
-        <h3>Informations Générales</h3>
-        <table style="margin-top:10px;">
-          <tr><td style="font-weight:500; width:30%;">Date retenue :</td><td id="dash-info-date">-</td></tr>
-          <tr><td style="font-weight:500;">Lieu de réception :</td><td id="dash-info-location">-</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <div id="invites" class="tab-content">
-      <div class="section-title-area">
-        <h2 style="font-size:2.2rem;">Liste des Invités</h2>
-        <button class="btn" onclick="openModal('modal-add-guest')">Ajouter un groupe / invité</button>
-      </div>
-      <div class="card" style="padding:15px; overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom / Foyer</th>
-              <th>Type</th>
-              <th>Adultes</th>
-              <th>Enfants</th>
-              <th>Présence</th>
-              <th>Régime / Notes</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="table-guests-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="budget-tab" class="tab-content">
-      <div class="section-title-area">
-        <h2 style="font-size:2.2rem;">Postes Budgétaires</h2>
-        <button class="btn" onclick="openModal('modal-add-budget')">Ajouter un poste</button>
-      </div>
-
-      <div class="charts-wrapper">
-        <div class="card">
-          <h3 style="font-size: 1.3rem;">Réel Dépensé vs Reste Global</h3>
-          <div class="chart-container">
-            <canvas id="chart-budget-vs-target"></canvas>
-          </div>
-        </div>
-        <div class="card">
-          <h3 style="font-size: 1.3rem;">Répartition par poste</h3>
-          <div class="chart-container">
-            <canvas id="chart-dash-budget"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="padding:15px; overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Poste de dépense</th>
-              <th>Budget Alloué</th>
-              <th>Montant Engagé/Payé</th>
-              <th>Écart</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="table-budget-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="prestataires" class="tab-content">
-      <div class="section-title-area">
-        <h2 style="font-size:2.2rem;">Prestataires Engagés</h2>
-        <button class="btn" onclick="openModal('modal-add-vendor')">Ajouter un prestataire</button>
-      </div>
-      <div class="card" style="padding:15px; overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Catégorie</th>
-              <th>Nom de l'entreprise</th>
-              <th>Contact / Tél</th>
-              <th>Tarif convenu</th>
-              <th>Statut Contrat</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="table-vendors-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="taches" class="tab-content">
-      <div class="section-title-area">
-        <h2 style="font-size:2.2rem;">Suivi des Tâches</h2>
-        <button class="btn" onclick="openModal('modal-add-task')">Créer une tâche</button>
-      </div>
-      <div class="tasks-container">
-        <div class="card">
-          <h3 style="color:var(--sage-dark);">À faire</h3>
-          <div id="tasks-todo-list" style="margin-top:15px;"></div>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--text-muted);">Terminées</h3>
-          <div id="tasks-done-list" style="margin-top:15px;"></div>
+        <h3 style="font-size: 1.3rem;">Répartition par poste (Dépenses réelles)</h3>
+        <div class="chart-container">
+          <canvas id="chart-dash-budget"></canvas>
         </div>
       </div>
     </div>
 
-    <div id="idees" class="tab-content">
-      <div class="section-title-area">
-        <h2 style="font-size:2.2rem;">Boîte à Idées & Liens Utiles</h2>
-        <button class="btn" onclick="openModal('modal-add-link')">Ajouter une idée</button>
-      </div>
-      <div id="links-container" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"></div>
+    <div class="card" style="padding:15px; overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Poste de dépense</th>
+            <th>Budget Alloué</th>
+            <th>Montant Engagé/Payé</th>
+            <th>Écart</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-budget-body"></tbody>
+      </table>
     </div>
-
-    <!-- MODULE ASSISTANT IA GEMINI -->
-    <div id="gemini-ia" class="tab-content">
-      <h2 style="font-size:2.2rem; margin-bottom:25px;">Assistant IA - Gemini Cloud</h2>
-      <div class="card" style="max-width:800px;">
-        <h3>Posez vos questions d'organisation</h3>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Besoin d'idées de textes, de suggestions d'animations ou de conseils pour le planning ? Gemini vous répond en direct.</p>
-        
-        <div class="form-group">
-          <label>Votre demande à l'IA</label>
-          <textarea id="ia-prompt" class="form-control" rows="4" placeholder="Ex: Donne-moi 3 idées d'animations originales et élégantes pour occuper les enfants pendant le repas..."></textarea>
-        </div>
-        <button class="btn btn-gold" id="btn-call-ia" onclick="askGeminiIA()">Demander à l'assistant Gemini</button>
-
-        <div id="ia-response-box" class="card" style="margin-top:30px; background-color:var(--ivory); display:none; border-left:4px solid var(--gold);">
-          <h4 style="font-family:'Jost', sans-serif; font-weight:500; text-transform:uppercase; font-size:0.8rem; letter-spacing:1px; color:var(--text-muted); margin-bottom:10px;">Réponse de Gemini :</h4>
-          <p id="ia-reponse" style="white-space: pre-wrap; font-size:1rem; color:var(--text); line-height:1.7;"></p>
-        </div>
-      </div>
-    </div>
-
-    <div id="config-tab" class="tab-content">
-      <h2 style="font-size:2.2rem; margin-bottom:25px;">Paramètres Généraux</h2>
-      <div class="card" style="max-width:600px;">
-        <div class="form-group">
-          <label>Noms du couple</label>
-          <input type="text" id="settings-names" class="form-control">
-        </div>
-        <div class="form-group">
-          <label>Budget total global (€)</label>
-          <input type="number" id="settings-budget" class="form-control">
-        </div>
-        <div class="form-group">
-          <label>Date du mariage</label>
-          <input type="date" id="settings-date" class="form-control">
-        </div>
-        <div class="form-group">
-          <label>Lieu de réception</label>
-          <input type="text" id="settings-location" class="form-control">
-        </div>
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-gold" style="flex:1;" onclick="saveGeneralSettings()">Sauvegarder les configurations</button>
-          <button class="btn btn-danger" onclick="logoutWithFirebase()">Déconnexion</button>
-        </div>
-      </div>
-    </div>
-
   </div>
+
+  <div id="prestataires" class="tab-content">
+    <div class="section-title-area">
+      <h2 style="font-size:2.2rem;">Prestataires Engagés</h2>
+      <button class="btn" onclick="openModal('modal-add-vendor')">Ajouter un prestataire</button>
+    </div>
+    <div class="card" style="padding:15px; overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Catégorie</th>
+            <th>Nom de l'entreprise</th>
+            <th>Contact / Tél</th>
+            <th>Tarif convenu</th>
+            <th>Statut Contrat</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-vendors-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="taches" class="tab-content">
+    <div class="section-title-area">
+      <h2 style="font-size:2.2rem;">Suivi des Tâches</h2>
+      <button class="btn" onclick="openModal('modal-add-task')">Créer une tâche</button>
+    </div>
+    <div class="tasks-container">
+      <div class="card">
+        <h3 style="color:var(--sage-dark);">À faire</h3>
+        <div id="tasks-todo-list" style="margin-top:15px;"></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--text-muted);">Terminées</h3>
+        <div id="tasks-done-list" style="margin-top:15px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="idees" class="tab-content">
+    <div class="section-title-area">
+      <h2 style="font-size:2.2rem;">Boîte à Idées & Liens Utiles</h2>
+      <button class="btn" onclick="openModal('modal-add-link')">Ajouter une idée</button>
+    </div>
+    <div id="links-container" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"></div>
+  </div>
+
+  <div id="config-tab" class="tab-content">
+    <h2 style="font-size:2.2rem; margin-bottom:25px;">Paramètres Généraux</h2>
+    <div class="card" style="max-width:600px;">
+      <div class="form-group">
+        <label>Noms du couple</label>
+        <input type="text" id="settings-names" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Budget total global (€)</label>
+        <input type="number" id="settings-budget" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Date du mariage</label>
+        <input type="date" id="settings-date" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>Lieu de réception</label>
+        <input type="text" id="settings-location" class="form-control">
+      </div>
+      <button class="btn btn-gold" onclick="saveGeneralSettings()">Sauvegarder les configurations</button>
+    </div>
+  </div>
+
 </div>
 
-<!-- MODALS -->
 <div id="modal-add-guest" class="modal-overlay" onclick="closeModal(event)">
   <div class="modal-window">
     <div class="modal-header"><h2>Nouvel Invité / Foyer</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
@@ -369,7 +333,7 @@
 <div id="modal-add-budget" class="modal-overlay" onclick="closeModal(event)">
   <div class="modal-window">
     <div class="modal-header"><h2>Nouveau Poste Budgétaire</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
-    <div class="form-group"><label>Désignation du poste</label><input type="text" id="add-b-name" class="form-control" placeholder="Ex: Traiteur, Robe..."></div>
+    <div class="form-group"><label>Désignation du poste</label><input type="text" id="add-b-name" class="form-control" placeholder="Ex: Traiteur, Robe, Photographe..."></div>
     <div class="form-group"><label>Budget alloué (€)</label><input type="number" id="add-b-alloc" class="form-control" value="0"></div>
     <div class="form-group"><label>Montant engagé / payé (€)</label><input type="number" id="add-b-spent" class="form-control" value="0"></div>
     <button class="btn" style="width:100%;" onclick="addBudgetSubmit()">Créer le poste</button>
@@ -388,7 +352,7 @@
     <div class="modal-header"><h2>Nouveau Prestataire</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
     <div class="form-group"><label>Catégorie métier</label><input type="text" id="add-v-cat" class="form-control" placeholder="Ex: Musique, Fleurs..."></div>
     <div class="form-group"><label>Nom de l'entreprise</label><input type="text" id="add-v-name" class="form-control"></div>
-    <div class="form-group"><label>Contact (Tél, Mail)</label><input type="text" id="add-v-contact" class="form-control"></div>
+    <div class="form-group"><label>Contact (Tél, Mail, Nom)</label><input type="text" id="add-v-contact" class="form-control"></div>
     <div class="form-group"><label>Tarif convenu global (€)</label><input type="number" id="add-v-amount" class="form-control" value="0"></div>
     <div class="form-group"><label>Statut engagement</label><select id="add-v-status" class="form-control"><option value="Recherche / Devis">Recherche / Devis</option><option value="Option validée">Option validée</option><option value="Contrat signé">Contrat signé</option></select></div>
     <button class="btn" style="width:100%;" onclick="addVendorSubmit()">Ajouter le prestataire</button>
@@ -397,11 +361,11 @@
 
 <div id="modal-add-task" class="modal-overlay" onclick="closeModal(event)">
   <div class="modal-window">
-    <div class="modal-header"><h2>Nouvelle Tâche</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
+    <div class="modal-header"><h2>Nouvelle Tâche de planification</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
     <div class="form-group"><label>Intitulé de l'action</label><input type="text" id="add-t-name" class="form-control"></div>
-    <div class="form-group"><label>Responsable</label><input type="text" id="add-t-owner" class="form-control" placeholder="Ex: L & T"></div>
-    <div class="form-group"><label>Échéance</label><input type="text" id="add-t-due" class="form-control" placeholder="Ex: Fin mai..."></div>
-    <div class="form-group"><label>Catégorie</label><input type="text" id="add-t-tag" class="form-control" placeholder="Ex: Déco, Traiteur..."></div>
+    <div class="form-group"><label>Responsable (Initiales ou prénom)</label><input type="text" id="add-t-owner" class="form-control" placeholder="Ex: L & T"></div>
+    <div class="form-group"><label>Échéance (Date ou texte)</label><input type="text" id="add-t-due" class="form-control" placeholder="Ex: Fin mai, Décembre..."></div>
+    <div class="form-group"><label>Catégorie d'action</label><input type="text" id="add-t-tag" class="form-control" placeholder="Ex: Administratif, Déco..."></div>
     <div class="form-group"><label>Section</label><select id="add-t-sec" class="form-control"><option value="todo">À faire</option><option value="done">Terminée</option></select></div>
     <button class="btn" style="width:100%;" onclick="addTaskSubmit()">Créer la tâche</button>
   </div>
@@ -409,27 +373,22 @@
 
 <div id="modal-add-link" class="modal-overlay" onclick="closeModal(event)">
   <div class="modal-window">
-    <div class="modal-header"><h2>Ajouter une idée</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
+    <div class="modal-header"><h2>Ajouter une idée ou un lien inspirant</h2><button class="close-modal" onclick="closeModalDirect()">&times;</button></div>
     <div class="form-group"><label>Titre de l'idée</label><input type="text" id="add-l-title" class="form-control"></div>
     <div class="form-group"><label>Adresse Web (URL)</label><input type="text" id="add-l-url" class="form-control" value="https://"></div>
     <div class="form-group"><label>Description / Note</label><input type="text" id="add-l-desc" class="form-control"></div>
-    <div class="form-group"><label>Thématique</label><input type="text" id="add-l-label" class="form-control" placeholder="Ex: Costumes, Idées déco..."></div>
+    <div class="form-group"><label>Thématique</label><input type="text" id="add-l-label" class="form-control" placeholder="Ex: Traiteur, Costumes..."></div>
     <button class="btn" style="width:100%;" onclick="addLinkSubmit()">Enregistrer l'idée</button>
   </div>
 </div>
 
 <div class="toast-msg" id="toast">Opération réussie !</div>
 
-<!-- PIPELINE DES MODULES FIREBASE & GEMINI -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  // Importation des services Firebase Authentication
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  // SDK API Gemini Cloud
-  import { GoogleGenAI } from "https://esm.run/@google/genai";
 
-  // Identifiants de connexion Firebase de votre projet web
+  // Configuration de l'application Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyA12qa6k5W3ImdbaeFxLAO28mv8bl4yg-Q",
     authDomain: "mywedding-37c60.firebaseapp.com",
@@ -440,14 +399,15 @@
     measurementId: "G-PWBYB6VG7W"
   };
 
+  // Initialisation de Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const auth = getAuth(app);
 
+  // Variables globales pour stocker les instances des graphiques Chart.js
   let myDashChart = null;
   let myTargetChart = null;
-  let unsubscribeSnapshot = null; // Permet de couper l'écoute réseau proprement si déconnexion
 
+  // État initial par défaut
   const defaultState = {
     coupleNames: "Sophie & Thomas",
     totalBudget: 25000,
@@ -463,75 +423,50 @@
   let state = { ...defaultState };
   const docRef = doc(db, "mariages_data", "general_dashboard");
 
-  // FONCTION DU BOUTON DE CONNEXION FIREBASE AUTH
-  window.loginWithFirebase = async function() {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const btn = document.getElementById('btn-login');
-
-    if(!email || !password) return alert("Veuillez saisir votre e-mail et votre mot de passe.");
-
-    btn.disabled = true;
-    btn.textContent = "Vérification...";
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Le changement d'état est capté automatiquement en dessous par onAuthStateChanged
-    } catch (error) {
-      console.error("Erreur Auth :", error.code);
-      alert("Identifiants incorrects. Veuillez réessayer.");
-      btn.disabled = false;
-      btn.textContent = "Se connecter";
-    }
-  };
-
-  // FONCTION DE DÉCONNEXION SÉCURISÉE
-  window.logoutWithFirebase = async function() {
-    if(confirm("Voulez-vous vous déconnecter de votre espace ?")) {
-      if(unsubscribeSnapshot) unsubscribeSnapshot(); // Coupe la liaison BDD active
-      await signOut(auth);
-      window.location.reload(); // Force un rafraîchissement propre de l'affichage
-    }
-  };
-
-  // ÉCOUTEUR PERMANENT DE SESSIONS UTILISATEUR (PERSISTANCE CLOUD)
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Masquer l'écran d'authentification et afficher l'application globale
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('main-app-content').style.display = 'block';
-      toast("Session authentifiée via Firebase Cloud.");
-
-      // Lancement de l'écoute temps réel de la base Firestore
-      unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          state = docSnap.data();
-          if (!state.guests) state.guests = [];
-          if (!state.budget) state.budget = [];
-          if (!state.vendors) state.vendors = [];
-          if (!state.tasks) state.tasks = [];
-          if (!state.links) state.links = [];
-        } else {
-          setDoc(docRef, defaultState);
-        }
-        renderAll();
-      });
+  // Synchronisation Firebase Cloud temps réel
+  onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      state = docSnap.data();
+      if (!state.guests) state.guests = [];
+      if (!state.budget) state.budget = [];
+      if (!state.vendors) state.vendors = [];
+      if (!state.tasks) state.tasks = [];
+      if (!state.links) state.links = [];
     } else {
-      // Si l'utilisateur n'est pas loggé ou déconnecté
-      document.getElementById('auth-screen').style.display = 'flex';
-      document.getElementById('main-app-content').style.display = 'none';
+      console.log("Initialisation du document global sur Firebase Cloud...");
+      setDoc(docRef, defaultState);
     }
+    renderAll();
   });
 
   async function saveStateToCloud() {
     try {
       await setDoc(docRef, state);
     } catch (err) {
-      console.error("Erreur Firebase : ", err);
-      toast("Échec de synchronisation réseau !");
+      console.error("Erreur d'écriture sur Firebase : ", err);
+      toast("Erreur de synchronisation réseau !");
     }
   }
 
+  // Écran de déverrouillage
+  window.checkLockPassword = function() {
+    const input = document.getElementById('lock-input').value;
+    if(input === "NotreMariage2026") {
+      sessionStorage.setItem('dashboard_unlocked', 'true');
+      document.getElementById('lock-screen').style.display = 'none';
+      toast("Connexion établie avec Firebase Cloud");
+    } else {
+      alert("Code d'accès incorrect.");
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if(sessionStorage.getItem('dashboard_unlocked') === 'true') {
+      document.getElementById('lock-screen').style.display = 'none';
+    }
+  });
+
+  // Moteur de rendu principal
   function renderAll() {
     renderHeader();
     renderDashboard();
@@ -541,13 +476,16 @@
     renderTasks();
     renderLinks();
     fillSettingsForm();
+    // Met à jour les Donuts à chaque actualisation des données de l'état réactif
     updateBudgetCharts();
   }
 
+  // FONCTION DE RENDU SÉCURISÉ DES DONUTS (CHART.JS)
   function updateBudgetCharts() {
     const canvasDash = document.getElementById('chart-dash-budget');
     const canvasTarget = document.getElementById('chart-budget-vs-target');
 
+    // Sécurité DOM : Si les canvas ne sont pas chargés ou visibles, on reporte l'exécution
     if (!canvasDash || !canvasTarget) {
       setTimeout(updateBudgetCharts, 50);
       return;
@@ -558,68 +496,43 @@
     const totalSpent = spentData.reduce((a, b) => a + b, 0);
     const chartColors = ['#8a9e8c', '#c9a96e', '#e8c4b8', '#b8cbb8', '#e8d5b0', '#5e7260', '#cc5c5c', '#8a8078'];
 
+    // 1. Graphique répartition par poste
     if (myDashChart) myDashChart.destroy();
     myDashChart = new Chart(canvasDash.getContext('2d'), {
       type: 'doughnut',
       data: {
-        labels: totalSpent === 0 ? ['Aucune dépense'] : labels,
+        labels: totalSpent === 0 ? ['Aucune dépense enregistrée'] : labels,
         datasets: [{
           data: totalSpent === 0 ? [1] : spentData,
           backgroundColor: totalSpent === 0 ? ['#f0ebe1'] : chartColors
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } 
+      }
     });
 
+    // 2. Graphique Réel vs Budget Cible Global
     if (myTargetChart) myTargetChart.destroy();
     const remainingTarget = Math.max(0, state.totalBudget - totalSpent);
     myTargetChart = new Chart(canvasTarget.getContext('2d'), {
       type: 'doughnut',
       data: {
-        labels: ['Dépensé Réel', 'Reste dispo'],
+        labels: ['Dépensé Réel', 'Reste disponible'],
         datasets: [{
           data: [totalSpent, remainingTarget],
           backgroundColor: ['#cc5c5c', '#e2ece4']
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        plugins: { legend: { position: 'bottom' } } 
+      }
     });
   }
-
-  // APPEL INTERNE À GEMINI 1.5 FLASH (A CONSERVER ENTRE GUILLEMETS)
-  window.askGeminiIA = async function() {
-    const promptInput = document.getElementById('ia-prompt').value.trim();
-    const reponseText = document.getElementById('ia-reponse');
-    const responseBox = document.getElementById('ia-response-box');
-    const btnIa = document.getElementById('btn-call-ia');
-
-    if(!promptInput) return toast("Veuillez renseigner votre question.");
-
-    responseBox.style.display = 'block';
-    reponseText.innerHTML = "<em>L'assistant Gemini analyse votre demande...</em>";
-    btnIa.disabled = true;
-
-    try {
-      // PLACEZ VOTRE CLÉ API ENTRE LES GUILLEMETS ICI :
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyBcFSQZGy9PQJbteHZGhfSNrrJTbyb7VCg" });
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: promptInput,
-      });
-
-      if(response && response.text) {
-        reponseText.textContent = response.text;
-      } else {
-        reponseText.textContent = "Aucun retour exploitable du modèle.";
-      }
-    } catch (error) {
-      console.error("Erreur Gemini :", error);
-      reponseText.innerHTML = "<span style='color:#cc5c5c;'>⚠️ Échec de génération. Assurez-vous d'avoir inséré une clé API valide à la ligne 332 du script.</span>";
-    } finally {
-      btnIa.disabled = false;
-    }
-  };
 
   function renderHeader() {
     document.getElementById('header-names').textContent = state.coupleNames;
@@ -645,7 +558,7 @@
 
     const totalSpent = state.budget.reduce((acc, curr) => acc + (parseFloat(curr.spent) || 0), 0);
     document.getElementById('dash-budget-spent').textContent = totalSpent.toLocaleString('fr-FR') + " €";
-    document.getElementById('dash-budget-desc').textContent = `Engagés sur un budget de ${state.totalBudget.toLocaleString('fr-FR')} €`;
+    document.getElementById('dash-budget-desc').textContent = `Engagés sur un budget prévisionnel de ${state.totalBudget.toLocaleString('fr-FR')} €`;
     
     let pct = (totalSpent / state.totalBudget) * 100;
     if(pct > 100) pct = 100;
@@ -653,7 +566,7 @@
 
     const todoTasks = state.tasks.filter(x => x.section === 'todo').length;
     document.getElementById('dash-tasks-count').textContent = state.tasks.length;
-    document.getElementById('dash-tasks-desc').textContent = `${todoTasks} restantes`;
+    document.getElementById('dash-tasks-desc').textContent = `${todoTasks} tâches restant à accomplir`;
 
     document.getElementById('dash-info-date').textContent = formatFrenchDate(state.weddingDate);
     document.getElementById('dash-info-location').textContent = state.location || 'Non renseigné';
@@ -663,7 +576,7 @@
     const body = document.getElementById('table-guests-body');
     body.innerHTML = '';
     if(state.guests.length === 0) {
-      body.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">Aucun invité.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">Aucun invité enregistré pour le moment.</td></tr>`;
       return;
     }
     state.guests.forEach(g => {
@@ -694,7 +607,7 @@
     const body = document.getElementById('table-budget-body');
     body.innerHTML = '';
     if(state.budget.length === 0) {
-      body.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:30px;">Aucune ligne budgétaire.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:30px;">Aucun poste de dépense créé.</td></tr>`;
       return;
     }
     state.budget.forEach(b => {
@@ -721,13 +634,13 @@
     const body = document.getElementById('table-vendors-body');
     body.innerHTML = '';
     if(state.vendors.length === 0) {
-      body.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">Aucun prestataire.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">Aucun prestataire enregistré.</td></tr>`;
       return;
     }
     state.vendors.forEach(v => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="text-transform:uppercase; font-size:0.8rem; color:var(--text-muted);">${escapeHtml(v.category)}</td>
+        <td style="text-transform:uppercase; font-size:0.8rem; letter-spacing:0.5px; color:var(--text-muted);">${escapeHtml(v.category)}</td>
         <td style="font-weight:500;">${escapeHtml(v.name)}</td>
         <td style="font-size:0.85rem;">${escapeHtml(v.contact || '-')}</td>
         <td>${v.amount.toLocaleString('fr-FR')} €</td>
@@ -749,8 +662,8 @@
     const todos = state.tasks.filter(x => x.section === 'todo');
     const dones = state.tasks.filter(x => x.section === 'done');
 
-    if(todos.length === 0) todoList.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Tout est fait ! 🎉</p>';
-    if(dones.length === 0) doneList.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Rien de validé.</p>';
+    if(todos.length === 0) todoList.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Toutes les actions sont accomplies ! 🎉</p>';
+    if(dones.length === 0) doneList.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Aucune action validée pour l\'instant.</p>';
 
     state.tasks.forEach(t => {
       const item = document.createElement('div');
@@ -759,9 +672,9 @@
         <input type="checkbox" class="task-checkbox" ${t.section==='done'?'checked':''} onclick="toggleTask(${t.id})">
         <div class="task-details ${t.section==='done'?'done':''}">
           <div class="t-title" style="font-weight:500;">${escapeHtml(t.name)}</div>
-          <div class="t-meta">Qui : <strong>${escapeHtml(t.owner || 'Tous')}</strong> • Échéance : ${escapeHtml(t.due || '-')} • <span style="color:var(--gold);">${escapeHtml(t.tag)}</span></div>
+          <div class="t-meta">Qui : <strong>${escapeHtml(t.owner || 'Tout le monde')}</strong> • Échéance : ${escapeHtml(t.due || 'Non fixée')} • <span style="color:var(--gold);">${escapeHtml(t.tag)}</span></div>
         </div>
-        <button class="close-modal" style="font-size:1.1rem;" onclick="deleteTask(${t.id})">&times;</button>
+        <button class="close-modal" style="font-size:1.1rem; padding:0 5px;" onclick="deleteTask(${t.id})">&times;</button>
       `;
       if(t.section === 'todo') todoList.appendChild(item);
       else doneList.appendChild(item);
@@ -773,7 +686,7 @@
     container.innerHTML = '';
     if(state.links.length === 0) {
       container.style.display = 'block';
-      container.innerHTML = '<div class="card" style="text-align:center; color:var(--text-muted);">Boîte vide.</div>';
+      container.innerHTML = '<div class="card" style="text-align:center; color:var(--text-muted);">Aucune note ou lien partagé pour le moment.</div>';
       return;
     }
     container.style.display = 'grid';
@@ -785,8 +698,8 @@
           <div style="flex:1;">
             <span class="badge badge-yes" style="margin-bottom:8px; font-size:0.65rem;">${escapeHtml(l.label)}</span>
             <h4 style="font-size:1.3rem; font-family:'Cormorant Garamond',serif; font-weight:600; margin-bottom:5px;">${escapeHtml(l.title)}</h4>
-            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">${escapeHtml(l.desc || '')}</p>
-            <a href="${l.url}" target="_blank" class="btn btn-outline btn-sm">Ouvrir le lien ↗</a>
+            <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">${escapeHtml(l.desc || 'Pas de description.')}</p>
+            <a href="${l.url}" target="_blank" class="btn btn-outline btn-sm">Ouvrir le lien externe ↗</a>
           </div>
           <button class="close-modal" onclick="deleteLink(${l.id})">&times;</button>
         </div>
@@ -795,7 +708,7 @@
     });
   }
 
-  // OPERATIONS FORMULAIRES DE CONFIGS ET INTERFACES MODALES
+  // Opérations de soumission
   window.addGuestSubmit = function() {
     const name = document.getElementById('add-g-name').value.trim();
     const type = document.getElementById('add-g-type').value;
@@ -809,7 +722,7 @@
     state.guests.push({ id: Date.now(), name, type, adults, kids, status, notes });
     saveStateToCloud();
     closeModalDirect();
-    toast('Invité enregistré sur le Cloud !');
+    toast('Groupe d\'invités ajouté au Cloud !');
   };
 
   window.editGuest = function(id) {
@@ -842,7 +755,7 @@
   };
 
   window.deleteGuest = function(id) {
-    if(confirm("Supprimer cet invité de la base Cloud ?")) {
+    if(confirm("Supprimer cet invité définitivement de la base Cloud ?")) {
       state.guests = state.guests.filter(x => x.id !== id);
       saveStateToCloud();
       toast('Invité supprimé.');
@@ -859,7 +772,7 @@
     state.budget.push({ id: Date.now(), name, allocated, spent });
     saveStateToCloud();
     closeModalDirect();
-    toast('Poste budgétaire créé.');
+    toast('Poste de dépense ajouté.');
   };
 
   window.editBudget = function(id) {
@@ -879,15 +792,15 @@
       b.spent = parseFloat(document.getElementById('edit-b-spent').value) || 0;
       saveStateToCloud();
       closeModalDirect();
-      toast('Budget réajusté !');
+      toast('Budget actualisé !');
     };
   };
 
   window.deleteBudget = function(id) {
-    if(confirm("Effacer définitivement cette ligne ?")) {
+    if(confirm("Supprimer ce poste de dépense ?")) {
       state.budget = state.budget.filter(x => x.id !== id);
       saveStateToCloud();
-      toast('Ligne supprimée.');
+      toast('Poste budgétaire supprimé.');
     }
   };
 
@@ -903,11 +816,11 @@
     state.vendors.push({ id: Date.now(), category, name, contact, amount, status });
     saveStateToCloud();
     closeModalDirect();
-    toast('Prestataire ajouté !');
+    toast('Prestataire enregistré !');
   };
 
   window.deleteVendor = function(id) {
-    if(confirm("Supprimer ce prestataire ?")) {
+    if(confirm("Retirer ce prestataire de la liste ?")) {
       state.vendors = state.vendors.filter(x => x.id !== id);
       saveStateToCloud();
       toast('Prestataire effacé.');
@@ -921,12 +834,12 @@
     const tag = document.getElementById('add-t-tag').value.trim();
     const section = document.getElementById('add-t-sec').value;
 
-    if(!name) return toast('Intitulé obligatoire.');
+    if(!name) return toast('L\'intitulé est indispensable.');
 
     state.tasks.push({ id: Date.now(), name, owner, due, tag: tag || 'Général', section });
     saveStateToCloud();
     closeModalDirect();
-    toast('Tâche planifiée.');
+    toast('Action ajoutée au planning.');
   };
 
   window.toggleTask = function(id) {
@@ -949,20 +862,20 @@
     const desc = document.getElementById('add-l-desc').value.trim();
     let label = document.getElementById('add-l-label').value.trim();
 
-    if(!title) return toast('Titre obligatoire.');
+    if(!title) return toast('Le titre de l\'idée est obligatoire.');
     if(!label) label = 'Divers';
     if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
 
     state.links.push({ id: Date.now(), label, title, url, desc });
     saveStateToCloud();
     closeModalDirect();
-    toast('Idée enregistrée.');
+    toast('Idée consignée !');
   };
 
   window.deleteLink = function(id) {
     state.links = state.links.filter(x => x.id !== id);
     saveStateToCloud();
-    toast('Idée supprimée.');
+    toast('Note supprimée.');
   };
 
   window.fillSettingsForm = function() {
@@ -979,9 +892,10 @@
     state.location = document.getElementById('settings-location').value.trim();
     
     saveStateToCloud();
-    toast('Paramètres sauvegardés en ligne !');
+    toast('Configurations sauvegardées en ligne !');
   };
 
+  // Gestion des onglets et rafraîchissement forcé des Donuts au clic
   window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -991,7 +905,8 @@
     const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
     if(btn) btn.classList.add('active');
 
-    if (tabId === 'budget-tab' || tabId === 'vue-generale') {
+    // Redessine instantanément les donuts si l'utilisateur bascule sur l'onglet budget
+    if (tabId === 'budget-tab') {
       updateBudgetCharts();
     }
   };
